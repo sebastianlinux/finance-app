@@ -192,6 +192,7 @@ function BudgetsPage() {
             variant="contained"
             startIcon={<AddIcon />}
             onClick={handleOpenNewDialog}
+            data-tutorial="add-budget"
           >
             {t('budgets.addBudget')}
           </Button>
@@ -213,7 +214,7 @@ function BudgetsPage() {
 
             return (
               <Grid size={{ xs: 12, md: 6 }} key={budget.id}>
-                <Card>
+                <Card data-tutorial="budget-progress">
                   <CardContent>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 2 }}>
                       <Box>

@@ -486,5 +486,92 @@
     "title": "Alerts",
     "noAlerts": "No alerts",
     "new": "New"
+  },
+  "tutorial": {
+    "welcome": "Welcome to Finance Tracker!",
+    "welcomeDescription": "Get started with our interactive tutorial or explore the app with demo data.",
+    "interactiveTour": "Interactive Tour",
+    "recommended": "Recommended",
+    "tourDescription": "Take a guided tour through the main features of the app. Learn how to use each section step by step.",
+    "startTour": "Start Tour",
+    "demoMode": "Demo Mode",
+    "explore": "Explore",
+    "demoDescription": "Explore the app with sample data. See how everything works without affecting your real data.",
+    "startDemo": "Start Demo",
+    "skip": "Skip",
+    "next": "Next",
+    "previous": "Previous",
+    "finish": "Finish",
+    "help": "Help & Tutorial",
+    "exitDemo": "Exit Demo Mode",
+    "demoModeDescription": "You are viewing the app with sample data. Your real data is safe.",
+    "main": {
+      "welcome": {
+        "title": "Welcome! 👋",
+        "content": "Welcome to Finance Tracker! This interactive tour will help you get started. Let's explore the main features together."
+      },
+      "navigation": {
+        "title": "Navigation Sidebar",
+        "content": "Use the sidebar to navigate between different sections: Dashboard, Transactions, Budgets, and more. Click on any item to go to that page."
+      },
+      "dashboard": {
+        "title": "Dashboard",
+        "content": "The Dashboard gives you a quick overview of your financial health. You'll see your balance, income, expenses, and recent transactions here."
+      },
+      "features": {
+        "title": "Ready to Start!",
+        "content": "You're all set! Start by adding your first transaction or creating a budget. Need help? Click the help icon anytime."
+      }
+    },
+    "dashboard": {
+      "welcome": {
+        "title": "Dashboard Overview 📊",
+        "content": "This is your financial dashboard. Here you can see all your key financial metrics at a glance."
+      },
+      "balance": {
+        "title": "Your Balance",
+        "content": "This card shows your current balance - the difference between your total income and expenses."
+      },
+      "charts": {
+        "title": "Visual Analytics",
+        "content": "These charts help you visualize your spending patterns, income trends, and category breakdowns."
+      },
+      "transactions": {
+        "title": "Recent Transactions",
+        "content": "Here you can see your most recent transactions. Click on 'Transactions' in the sidebar to manage all your transactions."
+      }
+    },
+    "transactions": {
+      "welcome": {
+        "title": "Transaction Management 💰",
+        "content": "This is where you manage all your income and expense transactions. Let's learn how to use it."
+      },
+      "add": {
+        "title": "Add Transaction",
+        "content": "Click this button to add a new transaction. You can record income or expenses with details like amount, category, date, and description."
+      },
+      "filters": {
+        "title": "Filter & Search",
+        "content": "Use filters to find specific transactions. You can filter by type, category, date range, and search by description."
+      },
+      "views": {
+        "title": "View Modes",
+        "content": "Switch between different view modes: Cards, Table, Calendar, or Compact view to see your transactions in the way that works best for you."
+      }
+    },
+    "budgets": {
+      "welcome": {
+        "title": "Budget Management 📋",
+        "content": "Budgets help you control your spending. Set limits for different categories and track your progress."
+      },
+      "add": {
+        "title": "Create Budget",
+        "content": "Click here to create a new budget. Set a spending limit for any category and choose if it's monthly or yearly."
+      },
+      "progress": {
+        "title": "Budget Progress",
+        "content": "Each budget card shows your progress with a visual indicator. Green means you're on track, red means you've exceeded the limit."
+      }
+    }
   }
 }

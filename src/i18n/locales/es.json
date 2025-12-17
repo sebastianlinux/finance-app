@@ -486,5 +486,92 @@
     "title": "Alertas",
     "noAlerts": "No hay alertas",
     "new": "Nuevo"
+  },
+  "tutorial": {
+    "welcome": "¡Bienvenido a Finance Tracker!",
+    "welcomeDescription": "Comienza con nuestro tutorial interactivo o explora la aplicación con datos de demostración.",
+    "interactiveTour": "Tour Interactivo",
+    "recommended": "Recomendado",
+    "tourDescription": "Realiza un tour guiado por las principales características de la aplicación. Aprende a usar cada sección paso a paso.",
+    "startTour": "Iniciar Tour",
+    "demoMode": "Modo Demo",
+    "explore": "Explorar",
+    "demoDescription": "Explora la aplicación con datos de ejemplo. Ve cómo funciona todo sin afectar tus datos reales.",
+    "startDemo": "Iniciar Demo",
+    "skip": "Omitir",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "finish": "Finalizar",
+    "help": "Ayuda y Tutorial",
+    "exitDemo": "Salir del Modo Demo",
+    "demoModeDescription": "Estás viendo la aplicación con datos de ejemplo. Tus datos reales están seguros.",
+    "main": {
+      "welcome": {
+        "title": "¡Bienvenido! 👋",
+        "content": "¡Bienvenido a Finance Tracker! Este tour interactivo te ayudará a comenzar. Exploremos las principales características juntos."
+      },
+      "navigation": {
+        "title": "Barra de Navegación",
+        "content": "Usa la barra lateral para navegar entre diferentes secciones: Dashboard, Transacciones, Presupuestos y más. Haz clic en cualquier elemento para ir a esa página."
+      },
+      "dashboard": {
+        "title": "Dashboard",
+        "content": "El Dashboard te da una vista rápida de tu salud financiera. Verás tu balance, ingresos, gastos y transacciones recientes aquí."
+      },
+      "features": {
+        "title": "¡Listo para Empezar!",
+        "content": "¡Ya estás listo! Comienza agregando tu primera transacción o creando un presupuesto. ¿Necesitas ayuda? Haz clic en el icono de ayuda en cualquier momento."
+      }
+    },
+    "dashboard": {
+      "welcome": {
+        "title": "Vista General del Dashboard 📊",
+        "content": "Este es tu dashboard financiero. Aquí puedes ver todas tus métricas financieras clave de un vistazo."
+      },
+      "balance": {
+        "title": "Tu Balance",
+        "content": "Esta tarjeta muestra tu balance actual - la diferencia entre tus ingresos totales y gastos."
+      },
+      "charts": {
+        "title": "Análisis Visual",
+        "content": "Estos gráficos te ayudan a visualizar tus patrones de gasto, tendencias de ingresos y desglose por categorías."
+      },
+      "transactions": {
+        "title": "Transacciones Recientes",
+        "content": "Aquí puedes ver tus transacciones más recientes. Haz clic en 'Transacciones' en la barra lateral para gestionar todas tus transacciones."
+      }
+    },
+    "transactions": {
+      "welcome": {
+        "title": "Gestión de Transacciones 💰",
+        "content": "Aquí es donde gestionas todas tus transacciones de ingresos y gastos. Aprendamos a usarlo."
+      },
+      "add": {
+        "title": "Agregar Transacción",
+        "content": "Haz clic en este botón para agregar una nueva transacción. Puedes registrar ingresos o gastos con detalles como cantidad, categoría, fecha y descripción."
+      },
+      "filters": {
+        "title": "Filtrar y Buscar",
+        "content": "Usa los filtros para encontrar transacciones específicas. Puedes filtrar por tipo, categoría, rango de fechas y buscar por descripción."
+      },
+      "views": {
+        "title": "Modos de Vista",
+        "content": "Cambia entre diferentes modos de vista: Tarjetas, Tabla, Calendario o Vista Compacta para ver tus transacciones de la manera que mejor te funcione."
+      }
+    },
+    "budgets": {
+      "welcome": {
+        "title": "Gestión de Presupuestos 📋",
+        "content": "Los presupuestos te ayudan a controlar tus gastos. Establece límites para diferentes categorías y rastrea tu progreso."
+      },
+      "add": {
+        "title": "Crear Presupuesto",
+        "content": "Haz clic aquí para crear un nuevo presupuesto. Establece un límite de gasto para cualquier categoría y elige si es mensual o anual."
+      },
+      "progress": {
+        "title": "Progreso del Presupuesto",
+        "content": "Cada tarjeta de presupuesto muestra tu progreso con un indicador visual. Verde significa que vas bien, rojo significa que has excedido el límite."
+      }
+    }
   }
 }

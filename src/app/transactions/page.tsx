@@ -515,6 +515,7 @@ function TransactionsPage() {
             exclusive
             onChange={(_, newMode) => newMode && setViewMode(newMode)}
             size="small"
+            data-tutorial="view-modes"
           >
             <ToggleButton value="card">
               <ViewListIcon sx={{ mr: 1 }} />
@@ -559,13 +560,14 @@ function TransactionsPage() {
             {t('transactions.export') || 'Export'}
           </Button>
           
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => handleOpenDialog()}
-          >
-            {t('transactions.addTransaction')}
-          </Button>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() => handleOpenDialog()}
+          data-tutorial="add-transaction"
+        >
+          {t('transactions.addTransaction')}
+        </Button>
         </Stack>
       </Box>
 

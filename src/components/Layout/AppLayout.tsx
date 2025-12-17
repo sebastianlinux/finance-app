@@ -33,11 +33,15 @@ import PersonIcon from '@mui/icons-material/Person';
 import ArticleIcon from '@mui/icons-material/Article';
 import LanguageIcon from '@mui/icons-material/Language';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/authStore';
 import { useFinanceStore } from '@/store/financeStore';
 import LanguageModal from '@/components/common/LanguageModal';
 import AlertsPanel from '@/components/common/AlertsPanel';
+import DemoModeBanner from '@/components/common/DemoModeBanner';
+import TutorialLauncher from '@/components/common/TutorialLauncher';
+import { useTutorial } from '@/hooks/useTutorial';
 
 const drawerWidth = 240;
 
@@ -49,6 +53,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [languageModalOpen, setLanguageModalOpen] = useState(false);
+  const [tutorialLauncherOpen, setTutorialLauncherOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const theme = useTheme();
@@ -58,9 +63,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const logout = useAuthStore((state) => state.logout);
   const darkMode = useFinanceStore((state) => state.settings.darkMode);
   const updateSettings = useFinanceStore((state) => state.updateSettings);
+  const { demoMode, disableDemoMode } = useTutorial();
 
   const mainMenuItems = [
-    { text: t('common.dashboard'), icon: <DashboardIcon />, path: '/dashboard' },
+    { text: t('common.dashboard'), icon: <DashboardIcon />, path: '/dashboard', tutorialId: 'dashboard-link' },
     { text: t('common.transactions'), icon: <ReceiptIcon />, path: '/transactions' },
     { text: t('common.budgets'), icon: <AccountBalanceWalletIcon />, path: '/budgets' },
     { text: t('nav.recurring') || 'Recurring', icon: <ReceiptIcon />, path: '/recurring' },
@@ -114,31 +120,32 @@ export default function AppLayout({ children }: AppLayoutProps) {
         </Typography>
       </Toolbar>
       <Divider />
-      <List>
-        {mainMenuItems.map((item) => (
-          <ListItem key={item.path} disablePadding>
-            <ListItemButton
-              selected={pathname === item.path}
-              onClick={() => handleNavigation(item.path)}
-              sx={{
-                '&.Mui-selected': {
-                  bgcolor: 'primary.main',
-                  color: 'primary.contrastText',
-                  '&:hover': {
-                    bgcolor: 'primary.dark',
-                  },
-                  '& .MuiListItemIcon-root': {
+        <List>
+          {mainMenuItems.map((item) => (
+            <ListItem key={item.path} disablePadding>
+              <ListItemButton
+                selected={pathname === item.path}
+                onClick={() => handleNavigation(item.path)}
+                data-tutorial={item.tutorialId}
+                sx={{
+                  '&.Mui-selected': {
+                    bgcolor: 'primary.main',
                     color: 'primary.contrastText',
+                    '&:hover': {
+                      bgcolor: 'primary.dark',
+                    },
+                    '& .MuiListItemIcon-root': {
+                      color: 'primary.contrastText',
+                    },
                   },
-                },
-              }}
-            >
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
+                }}
+              >
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.text} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
       <Divider sx={{ my: 1 }} />
       <List>
         {secondaryMenuItems.map((item) => (
@@ -215,6 +222,16 @@ export default function AppLayout({ children }: AppLayoutProps) {
               sx={{ m: 0, mr: 1 }}
             />
 
+            {/* Tutorial/Help */}
+            <IconButton
+              color="inherit"
+              onClick={() => setTutorialLauncherOpen(true)}
+              sx={{ fontSize: '0.9rem' }}
+              title={t('tutorial.help') || 'Help & Tutorial'}
+            >
+              <HelpOutlineIcon />
+            </IconButton>
+
             {/* Language Selector */}
             <IconButton
               color="inherit"
@@ -254,6 +271,15 @@ export default function AppLayout({ children }: AppLayoutProps) {
         {/* Language Modal */}
         <LanguageModal open={languageModalOpen} onClose={() => setLanguageModalOpen(false)} />
       </AppBar>
+      
+      {/* Demo Mode Banner */}
+      {demoMode && <DemoModeBanner onDisable={disableDemoMode} />}
+      
+      {/* Tutorial Launcher */}
+      <TutorialLauncher
+        open={tutorialLauncherOpen}
+        onClose={() => setTutorialLauncherOpen(false)}
+      />
       <Box
         component="nav"
         sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}
@@ -272,6 +298,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
               width: drawerWidth,
             },
           }}
+          data-tutorial="sidebar"
         >
           {drawer}
         </Drawer>
@@ -285,6 +312,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
             },
           }}
           open
+          data-tutorial="sidebar"
         >
           {drawer}
         </Drawer>

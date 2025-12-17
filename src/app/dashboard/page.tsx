@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { Container, Typography, Grid, Card, CardContent, Box, Alert, IconButton } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useFinanceStore } from '@/store/financeStore';
@@ -31,6 +31,9 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { getAllCategoryKeys } from '@/utils/categories';
+import { useTutorial } from '@/hooks/useTutorial';
+import TutorialTour from '@/components/common/TutorialTour';
+import { getDashboardTutorialSteps } from '@/utils/tutorialSteps';
 
 function DashboardPage() {
   const { t } = useTranslation();
@@ -167,6 +170,19 @@ function DashboardPage() {
     return getCategoryAnalysisFn();
   }, [getCategoryAnalysisFn, transactions]);
 
+  // Tutorial
+  const { tutorialOpen, setTutorialOpen, markTutorialCompleted, startTutorial } = useTutorial();
+  const dashboardSteps = getDashboardTutorialSteps((key: string) => t(key) || key);
+  
+  // Auto-start tutorial on first visit (optional)
+  useEffect(() => {
+    const hasSeenTutorial = localStorage.getItem('tutorial_completed') === 'true';
+    if (!hasSeenTutorial && transactions.length === 0) {
+      // Opcional: auto-start si no hay datos
+      // startTutorial();
+    }
+  }, [transactions.length, startTutorial]);
+
   const statCards = [
     {
       title: t('dashboard.balance'),
@@ -224,7 +240,7 @@ function DashboardPage() {
       <Grid container spacing={3} sx={{ mt: 1, mb: 4 }}>
         {statCards.map((card) => (
           <Grid size={{ xs: 12, sm: 6, md: 4 }} key={card.title}>
-            <Card>
+            <Card data-tutorial={card.title === t('dashboard.balance') ? 'balance-card' : undefined}>
               <CardContent>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <Box>
@@ -248,13 +264,13 @@ function DashboardPage() {
         <>
           <Grid container spacing={3} sx={{ mb: 4 }}>
             {/* Income vs Expenses Trend */}
-            <Grid size={{ xs: 12, md: 8 }}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" fontWeight={600} gutterBottom>
-                    {t('dashboard.incomeVsExpenses') || 'Income vs Expenses Trend'}
-                  </Typography>
-                  <ResponsiveContainer width="100%" height={300}>
+          <Grid size={{ xs: 12, md: 8 }}>
+            <Card data-tutorial="charts">
+              <CardContent>
+                <Typography variant="h6" fontWeight={600} gutterBottom>
+                  {t('dashboard.incomeVsExpenses') || 'Income vs Expenses Trend'}
+                </Typography>
+                <ResponsiveContainer width="100%" height={300}>
                     <LineChart data={monthlyData}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="month" />
@@ -493,6 +509,17 @@ function DashboardPage() {
           </Grid>
         </Grid>
       )}
+
+      {/* Tutorial Tour */}
+      <TutorialTour
+        steps={dashboardSteps}
+        open={tutorialOpen}
+        onClose={() => {
+          setTutorialOpen(false);
+          markTutorialCompleted();
+        }}
+        onComplete={markTutorialCompleted}
+      />
     </Container>
   );
 }
