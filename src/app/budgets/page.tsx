@@ -23,6 +23,7 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import { useTranslation } from 'react-i18next';
 import { useFinanceStore } from '@/store/financeStore';
 import { Budget } from '@/types';
@@ -40,11 +41,13 @@ function BudgetsPage() {
   const translateCategory = useTranslateCategory();
   const budgets = useFinanceStore((state) => state.budgets);
   const addBudget = useFinanceStore((state) => state.addBudget);
+  const updateBudget = useFinanceStore((state) => state.updateBudget);
   const deleteBudget = useFinanceStore((state) => state.deleteBudget);
   const getCategorySpending = useFinanceStore((state) => state.getCategorySpending);
   const currency = useFinanceStore((state) => state.settings.currency);
 
   const [openDialog, setOpenDialog] = useState(false);
+  const [editingBudgetId, setEditingBudgetId] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [budgetToDelete, setBudgetToDelete] = useState<string | null>(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -58,18 +61,29 @@ function BudgetsPage() {
 
   const [errors, setErrors] = useState<Partial<Record<keyof typeof formData, string>>>({});
 
-  const handleOpenDialog = () => {
-    setFormData({
-      category: '',
-      limit: 0,
-      period: 'monthly',
-    });
+  const handleOpenDialog = (budget?: Budget) => {
+    if (budget) {
+      setFormData({
+        category: budget.category,
+        limit: budget.limit,
+        period: budget.period,
+      });
+      setEditingBudgetId(budget.id);
+    } else {
+      setFormData({
+        category: '',
+        limit: 0,
+        period: 'monthly',
+      });
+      setEditingBudgetId(null);
+    }
     setErrors({});
     setOpenDialog(true);
   };
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
+    setEditingBudgetId(null);
     setErrors({});
   };
 
@@ -85,9 +99,13 @@ function BudgetsPage() {
     }
 
     // Check if budget already exists for this category (normalize for comparison)
+    // But skip this check if we're editing the same budget
     const normalizedNewCategory = normalizeCategoryToKey(formData.category);
-    if (budgets.some((b) => normalizeCategoryToKey(b.category) === normalizedNewCategory)) {
-      newErrors.category = 'Budget already exists for this category';
+    const existingBudget = budgets.find(
+      (b) => normalizeCategoryToKey(b.category) === normalizedNewCategory
+    );
+    if (existingBudget && existingBudget.id !== editingBudgetId) {
+      newErrors.category = t('budgets.categoryExists') || 'Budget already exists for this category';
     }
 
     setErrors(newErrors);
@@ -99,8 +117,13 @@ function BudgetsPage() {
       return;
     }
 
-    addBudget(formData);
-    setSnackbarMessage(t('budgets.addBudget') + ' ' + t('common.save'));
+    if (editingBudgetId) {
+      updateBudget(editingBudgetId, formData);
+      setSnackbarMessage(t('budgets.editBudget') + ' ' + t('common.save'));
+    } else {
+      addBudget(formData);
+      setSnackbarMessage(t('budgets.addBudget') + ' ' + t('common.save'));
+    }
     setSnackbarOpen(true);
     handleCloseDialog();
   };
@@ -168,13 +191,22 @@ function BudgetsPage() {
                           size="small"
                         />
                       </Box>
-                      <IconButton
-                        color="error"
-                        onClick={() => handleDeleteClick(budget.id)}
-                        size="small"
-                      >
-                        <DeleteIcon />
-                      </IconButton>
+                      <Box sx={{ display: 'flex', gap: 0.5 }}>
+                        <IconButton
+                          color="primary"
+                          onClick={() => handleOpenDialog(budget)}
+                          size="small"
+                        >
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton
+                          color="error"
+                          onClick={() => handleDeleteClick(budget.id)}
+                          size="small"
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Box>
                     </Box>
 
                     <Box sx={{ mb: 2 }}>
@@ -228,9 +260,11 @@ function BudgetsPage() {
         </Grid>
       )}
 
-      {/* Add Budget Dialog */}
+      {/* Add/Edit Budget Dialog */}
       <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-        <DialogTitle>{t('budgets.addBudget')}</DialogTitle>
+        <DialogTitle>
+          {editingBudgetId ? t('budgets.editBudget') : t('budgets.addBudget')}
+        </DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2 }}>
             <TextField
@@ -244,9 +278,18 @@ function BudgetsPage() {
               fullWidth
               error={!!errors.category}
               helperText={errors.category}
+              disabled={!!editingBudgetId}
             >
               {categoryOptions
                 .filter((option) => {
+                  // If editing, allow the current budget's category
+                  if (editingBudgetId) {
+                    const currentBudget = budgets.find((b) => b.id === editingBudgetId);
+                    if (currentBudget && normalizeCategoryToKey(currentBudget.category) === normalizeCategoryToKey(option.value)) {
+                      return true;
+                    }
+                  }
+                  // Otherwise, only show categories that don't have budgets yet
                   const normalizedOptionKey = normalizeCategoryToKey(option.value);
                   return !budgets.some((b) => normalizeCategoryToKey(b.category) === normalizedOptionKey);
                 })

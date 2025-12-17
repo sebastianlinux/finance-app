@@ -22,7 +22,15 @@
     "totalIncome": "Ingresos Totales",
     "totalExpenses": "Gastos Totales",
     "recentTransactions": "Transacciones Recientes",
-    "noTransactions": "Aún no hay transacciones. ¡Añade tu primera transacción para comenzar!"
+    "noTransactions": "Aún no hay transacciones. ¡Añade tu primera transacción para comenzar!",
+    "incomeVsExpenses": "Tendencia Ingresos vs Gastos",
+    "expensesByCategory": "Gastos por Categoría",
+    "topExpenseCategories": "Principales Categorías de Gastos",
+    "avgMonthlyIncome": "Ingreso Mensual Promedio",
+    "avgMonthlyExpense": "Gasto Mensual Promedio",
+    "topCategory": "Categoría Principal",
+    "totalTransactions": "Total de Transacciones",
+    "noExpenseData": "No hay datos de gastos disponibles"
   },
   "transactions": {
     "title": "Transacciones",
@@ -36,9 +44,23 @@
     "date": "Fecha",
     "description": "Descripción",
     "noTransactions": "No se encontraron transacciones. Haz clic en 'Añadir Transacción' para crear la primera.",
+    "noFilteredTransactions": "No hay transacciones que coincidan con tus filtros. Intenta ajustar tu búsqueda o filtros.",
     "deleteConfirm": "¿Estás seguro de que quieres eliminar esta transacción?",
     "required": "Este campo es obligatorio",
-    "invalidAmount": "La cantidad debe ser mayor que 0"
+    "invalidAmount": "La cantidad debe ser mayor que 0",
+    "search": "Buscar transacciones...",
+    "filters": "Filtros",
+    "clearFilters": "Limpiar Filtros",
+    "all": "Todas",
+    "dateFrom": "Fecha Desde",
+    "dateTo": "Fecha Hasta",
+    "sortBy": "Ordenar Por",
+    "order": "Orden",
+    "desc": "Descendente",
+    "asc": "Ascendente",
+    "showing": "Mostrando",
+    "page": "Página",
+    "of": "de"
   },
   "budgets": {
     "title": "Presupuestos",
@@ -54,7 +76,8 @@
     "required": "Este campo es obligatorio",
     "invalidLimit": "El límite debe ser mayor que 0",
     "overBudget": "Sobre Presupuesto",
-    "onTrack": "En Camino"
+    "onTrack": "En Camino",
+    "categoryExists": "Ya existe un presupuesto para esta categoría"
   },
   "settings": {
     "title": "Configuración",

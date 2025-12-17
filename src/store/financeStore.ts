@@ -11,6 +11,7 @@ interface FinanceState {
 
   // Transaction actions
   addTransaction: (transaction: Omit<Transaction, 'id'>) => void;
+  updateTransaction: (id: string, transaction: Partial<Transaction>) => void;
   deleteTransaction: (id: string) => void;
 
   // Budget actions
@@ -51,6 +52,13 @@ export const useFinanceStore = create<FinanceState>()(
               id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
             },
           ],
+        })),
+
+      updateTransaction: (id, updates) =>
+        set((state) => ({
+          transactions: state.transactions.map((t) =>
+            t.id === id ? { ...t, ...updates } : t
+          ),
         })),
 
       deleteTransaction: (id) =>

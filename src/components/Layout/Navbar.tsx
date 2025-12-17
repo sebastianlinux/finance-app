@@ -205,9 +205,6 @@ export default function Navbar() {
       {/* Language Modal */}
       <LanguageModal open={languageModalOpen} onClose={() => setLanguageModalOpen(false)} />
 
-      {/* Language Modal */}
-      <LanguageModal open={languageModalOpen} onClose={() => setLanguageModalOpen(false)} />
-
       {/* Mobile Menu */}
       {isMobile && mobileMenuOpen && (
         <Box

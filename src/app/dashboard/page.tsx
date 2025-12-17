@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { Container, Typography, Grid, Card, CardContent, Box } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useFinanceStore } from '@/store/financeStore';
@@ -12,6 +13,22 @@ import { formatCurrency } from '@/utils/format';
 import { useTranslateCategory } from '@/utils/translateCategory';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import AppLayout from '@/components/Layout/AppLayout';
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
+import { getAllCategoryKeys } from '@/utils/categories';
 
 function DashboardPage() {
   const { t } = useTranslation();
@@ -20,10 +37,109 @@ function DashboardPage() {
   const totalIncome = useFinanceStore((state) => state.getTotalIncome());
   const totalExpenses = useFinanceStore((state) => state.getTotalExpenses());
   const transactions = useFinanceStore((state) => state.transactions);
+  const getCategorySpending = useFinanceStore((state) => state.getCategorySpending);
   const currency = useFinanceStore((state) => state.settings.currency);
+  
   const recentTransactions = [...transactions]
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 5);
+
+  // Calculate monthly data for trends
+  const monthlyData = useMemo(() => {
+    const monthlyMap = new Map<string, { income: number; expenses: number; month: string }>();
+    
+    transactions.forEach((transaction) => {
+      const date = new Date(transaction.date);
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      const monthLabel = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+      
+      if (!monthlyMap.has(monthKey)) {
+        monthlyMap.set(monthKey, { income: 0, expenses: 0, month: monthLabel });
+      }
+      
+      const data = monthlyMap.get(monthKey)!;
+      if (transaction.type === 'income') {
+        data.income += transaction.amount;
+      } else {
+        data.expenses += transaction.amount;
+      }
+    });
+    
+    return Array.from(monthlyMap.values())
+      .sort((a, b) => a.month.localeCompare(b.month))
+      .slice(-6); // Last 6 months
+  }, [transactions]);
+
+  // Calculate expenses by category
+  const expensesByCategory = useMemo(() => {
+    const categoryMap = new Map<string, number>();
+    const allCategories = getAllCategoryKeys();
+    
+    allCategories.forEach((category) => {
+      const spending = getCategorySpending(category);
+      if (spending > 0) {
+        categoryMap.set(category, spending);
+      }
+    });
+    
+    return Array.from(categoryMap.entries())
+      .map(([category, amount]) => ({
+        name: translateCategory(category),
+        value: amount,
+        category,
+      }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 8); // Top 8 categories
+  }, [transactions, getCategorySpending, translateCategory]);
+
+  // Calculate statistics
+  const stats = useMemo(() => {
+    if (transactions.length === 0) {
+      return {
+        avgMonthlyIncome: 0,
+        avgMonthlyExpense: 0,
+        topCategory: null,
+        transactionCount: 0,
+      };
+    }
+
+    const expenseTransactions = transactions.filter((t) => t.type === 'expense');
+    
+    // Calculate average monthly income/expense
+    const months = new Set(
+      transactions.map((t) => {
+        const date = new Date(t.date);
+        return `${date.getFullYear()}-${date.getMonth()}`;
+      })
+    ).size || 1;
+
+    const categorySpending = new Map<string, number>();
+    expenseTransactions.forEach((t) => {
+      const current = categorySpending.get(t.category) || 0;
+      categorySpending.set(t.category, current + t.amount);
+    });
+
+    const topCategory = Array.from(categorySpending.entries())
+      .sort((a, b) => b[1] - a[1])[0]?.[0] || null;
+
+    return {
+      avgMonthlyIncome: totalIncome / months,
+      avgMonthlyExpense: totalExpenses / months,
+      topCategory,
+      transactionCount: transactions.length,
+    };
+  }, [transactions, totalIncome, totalExpenses]);
+
+  const COLORS = [
+    '#1976d2',
+    '#9c27b0',
+    '#f50057',
+    '#ff9800',
+    '#4caf50',
+    '#00bcd4',
+    '#e91e63',
+    '#795548',
+  ];
 
   const statCards = [
     {
@@ -73,6 +189,161 @@ function DashboardPage() {
           </Grid>
         ))}
       </Grid>
+
+      {/* Charts Section */}
+      {transactions.length > 0 && (
+        <>
+          <Grid container spacing={3} sx={{ mb: 4 }}>
+            {/* Income vs Expenses Trend */}
+            <Grid size={{ xs: 12, md: 8 }}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" fontWeight={600} gutterBottom>
+                    {t('dashboard.incomeVsExpenses') || 'Income vs Expenses Trend'}
+                  </Typography>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={monthlyData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="month" />
+                      <YAxis />
+                      <Tooltip formatter={(value: number | undefined) => formatCurrency(value || 0, currency)} />
+                      <Legend />
+                      <Line
+                        type="monotone"
+                        dataKey="income"
+                        stroke="#4caf50"
+                        strokeWidth={2}
+                        name={t('dashboard.totalIncome')}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="expenses"
+                        stroke="#f50057"
+                        strokeWidth={2}
+                        name={t('dashboard.totalExpenses')}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            {/* Expenses by Category Pie Chart */}
+            <Grid size={{ xs: 12, md: 4 }}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" fontWeight={600} gutterBottom>
+                    {t('dashboard.expensesByCategory') || 'Expenses by Category'}
+                  </Typography>
+                  {expensesByCategory.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={300}>
+                      <PieChart>
+                        <Pie
+                          data={expensesByCategory}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="value"
+                        >
+                          {expensesByCategory.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip formatter={(value: number | undefined) => formatCurrency(value || 0, currency)} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <Box sx={{ height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Typography color="text.secondary">
+                        {t('dashboard.noExpenseData') || 'No expense data available'}
+                      </Typography>
+                    </Box>
+                  )}
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+
+          {/* Expenses by Category Bar Chart */}
+          {expensesByCategory.length > 0 && (
+            <Grid container spacing={3} sx={{ mb: 4 }}>
+              <Grid size={{ xs: 12 }}>
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" fontWeight={600} gutterBottom>
+                      {t('dashboard.topExpenseCategories') || 'Top Expense Categories'}
+                    </Typography>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <BarChart data={expensesByCategory}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
+                        <YAxis />
+                        <Tooltip formatter={(value: number | undefined) => formatCurrency(value || 0, currency)} />
+                        <Bar dataKey="value" fill="#1976d2" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
+          )}
+
+          {/* Additional Statistics */}
+          <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+              <Card>
+                <CardContent>
+                  <Typography color="text.secondary" gutterBottom variant="body2">
+                    {t('dashboard.avgMonthlyIncome') || 'Avg Monthly Income'}
+                  </Typography>
+                  <Typography variant="h6" fontWeight={700} color="success.main">
+                    {formatCurrency(stats.avgMonthlyIncome, currency)}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+              <Card>
+                <CardContent>
+                  <Typography color="text.secondary" gutterBottom variant="body2">
+                    {t('dashboard.avgMonthlyExpense') || 'Avg Monthly Expense'}
+                  </Typography>
+                  <Typography variant="h6" fontWeight={700} color="error.main">
+                    {formatCurrency(stats.avgMonthlyExpense, currency)}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+              <Card>
+                <CardContent>
+                  <Typography color="text.secondary" gutterBottom variant="body2">
+                    {t('dashboard.topCategory') || 'Top Category'}
+                  </Typography>
+                  <Typography variant="h6" fontWeight={700}>
+                    {stats.topCategory ? translateCategory(stats.topCategory) : 'N/A'}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+              <Card>
+                <CardContent>
+                  <Typography color="text.secondary" gutterBottom variant="body2">
+                    {t('dashboard.totalTransactions') || 'Total Transactions'}
+                  </Typography>
+                  <Typography variant="h6" fontWeight={700}>
+                    {stats.transactionCount}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+        </>
+      )}
 
       <Typography variant="h6" fontWeight={600} gutterBottom sx={{ mt: 4 }}>
         {t('dashboard.recentTransactions')}

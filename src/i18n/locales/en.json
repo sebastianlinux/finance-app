@@ -22,7 +22,15 @@
     "totalIncome": "Total Income",
     "totalExpenses": "Total Expenses",
     "recentTransactions": "Recent Transactions",
-    "noTransactions": "No transactions yet. Add your first transaction to get started!"
+    "noTransactions": "No transactions yet. Add your first transaction to get started!",
+    "incomeVsExpenses": "Income vs Expenses Trend",
+    "expensesByCategory": "Expenses by Category",
+    "topExpenseCategories": "Top Expense Categories",
+    "avgMonthlyIncome": "Avg Monthly Income",
+    "avgMonthlyExpense": "Avg Monthly Expense",
+    "topCategory": "Top Category",
+    "totalTransactions": "Total Transactions",
+    "noExpenseData": "No expense data available"
   },
   "transactions": {
     "title": "Transactions",
@@ -36,9 +44,23 @@
     "date": "Date",
     "description": "Description",
     "noTransactions": "No transactions found. Click 'Add Transaction' to create your first one.",
+    "noFilteredTransactions": "No transactions match your filters. Try adjusting your search or filters.",
     "deleteConfirm": "Are you sure you want to delete this transaction?",
     "required": "This field is required",
-    "invalidAmount": "Amount must be greater than 0"
+    "invalidAmount": "Amount must be greater than 0",
+    "search": "Search transactions...",
+    "filters": "Filters",
+    "clearFilters": "Clear Filters",
+    "all": "All",
+    "dateFrom": "From Date",
+    "dateTo": "To Date",
+    "sortBy": "Sort By",
+    "order": "Order",
+    "desc": "Descending",
+    "asc": "Ascending",
+    "showing": "Showing",
+    "page": "Page",
+    "of": "of"
   },
   "budgets": {
     "title": "Budgets",
@@ -54,7 +76,8 @@
     "required": "This field is required",
     "invalidLimit": "Limit must be greater than 0",
     "overBudget": "Over Budget",
-    "onTrack": "On Track"
+    "onTrack": "On Track",
+    "categoryExists": "Budget already exists for this category"
   },
   "settings": {
     "title": "Settings",
