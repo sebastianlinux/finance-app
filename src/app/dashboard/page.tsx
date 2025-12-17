@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Container, Typography, Grid, Card, CardContent, Box } from '@mui/material';
+import { Container, Typography, Grid, Card, CardContent, Box, Alert, IconButton } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useFinanceStore } from '@/store/financeStore';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
@@ -9,6 +9,8 @@ import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import EmptyState from '@/components/common/EmptyState';
 import ReceiptIcon from '@mui/icons-material/Receipt';
+import WarningIcon from '@mui/icons-material/Warning';
+import CloseIcon from '@mui/icons-material/Close';
 import { formatCurrency } from '@/utils/format';
 import { useTranslateCategory } from '@/utils/translateCategory';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
@@ -37,6 +39,7 @@ function DashboardPage() {
   const totalIncome = useFinanceStore((state) => state.getTotalIncome());
   const totalExpenses = useFinanceStore((state) => state.getTotalExpenses());
   const transactions = useFinanceStore((state) => state.transactions);
+  const budgets = useFinanceStore((state) => state.budgets);
   const getCategorySpending = useFinanceStore((state) => state.getCategorySpending);
   const currency = useFinanceStore((state) => state.settings.currency);
   
@@ -141,6 +144,16 @@ function DashboardPage() {
     '#795548',
   ];
 
+  // Check for budget overruns
+  const budgetAlerts = useMemo(() => {
+    return budgets
+      .map((budget) => {
+        const used = getCategorySpending(budget.category);
+        return { category: budget.category, used, limit: budget.limit };
+      })
+      .filter((b) => b.used > b.limit);
+  }, [budgets, transactions, getCategorySpending]);
+
   const statCards = [
     {
       title: t('dashboard.balance'),
@@ -167,6 +180,33 @@ function DashboardPage() {
       <Typography variant="h4" fontWeight={700} gutterBottom>
         {t('dashboard.title')}
       </Typography>
+
+      {/* Budget Alerts */}
+      {budgetAlerts.length > 0 && (
+        <Alert
+          severity="warning"
+          icon={<WarningIcon />}
+          sx={{ mb: 3 }}
+          action={
+            <IconButton
+              aria-label="close"
+              color="inherit"
+              size="small"
+            >
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          }
+        >
+          <Typography variant="body1" fontWeight={600} gutterBottom>
+            {t('dashboard.budgetExceeded') || 'Budget Exceeded!'}
+          </Typography>
+          {budgetAlerts.map((alert: { category: string; used: number; limit: number }, idx: number) => (
+            <Typography key={idx} variant="body2">
+              {translateCategory(alert.category)}: {formatCurrency(alert.used, currency)} / {formatCurrency(alert.limit, currency)} ({((alert.used / alert.limit) * 100).toFixed(1)}%)
+            </Typography>
+          ))}
+        </Alert>
+      )}
 
       <Grid container spacing={3} sx={{ mt: 1, mb: 4 }}>
         {statCards.map((card) => (

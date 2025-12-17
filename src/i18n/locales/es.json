@@ -14,7 +14,8 @@
     "confirm": "Confirmar",
     "close": "Cerrar",
     "loading": "Cargando...",
-    "noData": "No hay datos disponibles"
+    "noData": "No hay datos disponibles",
+    "actions": "Acciones"
   },
   "dashboard": {
     "title": "Panel",
@@ -30,7 +31,10 @@
     "avgMonthlyExpense": "Gasto Mensual Promedio",
     "topCategory": "Categoría Principal",
     "totalTransactions": "Total de Transacciones",
-    "noExpenseData": "No hay datos de gastos disponibles"
+    "noExpenseData": "No hay datos de gastos disponibles",
+    "budgetExceeded": "¡Presupuesto Excedido!",
+    "andMore": "y",
+    "more": "más"
   },
   "transactions": {
     "title": "Transacciones",
@@ -60,7 +64,24 @@
     "asc": "Ascendente",
     "showing": "Mostrando",
     "page": "Página",
-    "of": "de"
+    "of": "de",
+    "cardView": "Tarjetas",
+    "tableView": "Tabla",
+    "import": "Importar",
+    "export": "Exportar",
+    "exportSuccess": "Transacciones exportadas exitosamente",
+    "importTransactions": "Importar Transacciones",
+    "importInstructions": "Sube un archivo CSV con columnas: Fecha, Tipo, Categoría, Cantidad, Descripción",
+    "preview": "Vista Previa",
+    "transactions": "transacciones",
+    "importErrors": "Errores encontrados",
+    "importSuccess": "Transacciones importadas exitosamente",
+    "importConfirm": "Importar",
+    "row": "Fila",
+    "insufficientColumns": "Columnas insuficientes",
+    "invalidData": "Datos inválidos",
+    "invalidType": "El tipo debe ser 'income' o 'expense'",
+    "importEmptyFile": "El archivo está vacío"
   },
   "budgets": {
     "title": "Presupuestos",
@@ -115,7 +136,8 @@
     "features": "Características",
     "pricing": "Precios",
     "contact": "Contacto",
-    "about": "Acerca de"
+    "about": "Acerca de",
+    "home": "Inicio"
   },
   "footer": {
     "description": "Toma el control de tus finanzas con nuestro potente y intuitivo gestor financiero.",
@@ -291,6 +313,9 @@
     "subtitle": "Consejos e insights de expertos para ayudarte a gestionar mejor tus finanzas",
     "backToBlog": "Volver al Blog",
     "upgradeRequired": "Actualización Requerida",
-    "upgradeMessage": "El acceso completo a nuestros artículos del blog está disponible con planes Estándar o Premium. ¡Actualiza ahora para leer artículos completos y acceder a contenido exclusivo!"
+    "upgradeMessage": "El acceso completo a nuestros artículos del blog está disponible con planes Estándar o Premium. ¡Actualiza ahora para leer artículos completos y acceder a contenido exclusivo!",
+    "articleNotFound": "Artículo No Encontrado",
+    "articleNotFoundMessage": "El artículo que buscas no existe.",
+    "basicPlanRestriction": "Este artículo está disponible solo para planes Estándar y Premium"
   }
 }

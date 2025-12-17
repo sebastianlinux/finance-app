@@ -1,6 +1,6 @@
 'use client';
 
-import { Container, Typography, Box, Paper, Button, Card, CardContent } from '@mui/material';
+import { Container, Typography, Box, Paper, Button, Card, CardContent, Alert } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Layout/Navbar';
@@ -8,7 +8,9 @@ import Footer from '@/components/Layout/Footer';
 import { useAuthStore } from '@/store/authStore';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import PremiumModal from '@/components/PremiumModal';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import * as React from 'react';
+import LockIcon from '@mui/icons-material/Lock';
 
 // Blog articles content
 const blogContent: Record<string, { title: string; content: string; category: string; date: string }> = {
@@ -201,22 +203,69 @@ Building an emergency fund takes time and discipline, but it's one of the most i
   },
 };
 
-function BlogDetailPage({ params }: { params: { id: string } }) {
+function BlogDetailPage({ params }: { params: Promise<{ id: string }> | { id: string } }) {
   const { t } = useTranslation();
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const [premiumModalOpen, setPremiumModalOpen] = useState(false);
+  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null);
 
-  const article = blogContent[params.id];
+  // Handle both sync and async params (Next.js 13+)
+  React.useEffect(() => {
+    if (params instanceof Promise) {
+      params.then((resolved) => setResolvedParams(resolved));
+    } else {
+      setResolvedParams(params);
+    }
+  }, [params]);
+
+  const articleId = resolvedParams?.id;
+  const article = articleId ? blogContent[articleId] : null;
   const canAccessFullContent = user?.plan === 'standard' || user?.plan === 'premium';
+
+  if (!resolvedParams) {
+    return (
+      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        <Navbar />
+        <Box component="main" sx={{ flexGrow: 1, pt: '64px', py: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Container maxWidth="md">
+            <Typography variant="h6" color="text.secondary">
+              {t('common.loading')}
+            </Typography>
+          </Container>
+        </Box>
+        <Footer />
+      </Box>
+    );
+  }
 
   if (!article) {
     return (
       <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
         <Navbar />
-        <Box component="main" sx={{ flexGrow: 1, pt: '64px', py: 8 }}>
+        <Box component="main" sx={{ flexGrow: 1, pt: '64px', py: 8, bgcolor: 'background.default' }}>
           <Container maxWidth="md">
-            <Typography variant="h4">Article not found</Typography>
+            <Button
+              onClick={() => router.push('/blog')}
+              sx={{ mb: 4, textTransform: 'none' }}
+            >
+              ← {t('blog.backToBlog')}
+            </Button>
+            <Card sx={{ p: 4, textAlign: 'center' }}>
+              <Typography variant="h4" gutterBottom color="error">
+                {t('blog.articleNotFound') || 'Article Not Found'}
+              </Typography>
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+                {t('blog.articleNotFoundMessage') || 'The article you are looking for does not exist.'}
+              </Typography>
+              <Button
+                variant="contained"
+                onClick={() => router.push('/blog')}
+                sx={{ textTransform: 'none' }}
+              >
+                {t('blog.backToBlog')}
+              </Button>
+            </Card>
           </Container>
         </Box>
         <Footer />
@@ -254,6 +303,29 @@ function BlogDetailPage({ params }: { params: { id: string } }) {
             </Typography>
           </Box>
 
+          {/* Alert for basic plan users */}
+          {!canAccessFullContent && (
+            <Alert 
+              severity="warning" 
+              icon={<LockIcon />}
+              sx={{ mb: 3 }}
+              action={
+                <Button 
+                  color="inherit" 
+                  size="small" 
+                  onClick={() => setPremiumModalOpen(true)}
+                  sx={{ textTransform: 'none' }}
+                >
+                  {t('profile.upgradePlan')}
+                </Button>
+              }
+            >
+              <Typography variant="body2" fontWeight={600}>
+                {t('blog.basicPlanRestriction') || 'This article is available for Standard and Premium plans only'}
+              </Typography>
+            </Alert>
+          )}
+
           <Paper sx={{ p: 4 }}>
             <Typography variant="body1" paragraph sx={{ whiteSpace: 'pre-line', lineHeight: 1.8 }}>
               {contentPreview}
@@ -267,6 +339,7 @@ function BlogDetailPage({ params }: { params: { id: string } }) {
                     filter: 'blur(5px)',
                     pointerEvents: 'none',
                     userSelect: 'none',
+                    opacity: 0.5,
                   }}
                 >
                   <Typography variant="body1" sx={{ whiteSpace: 'pre-line', lineHeight: 1.8 }}>
@@ -280,8 +353,10 @@ function BlogDetailPage({ params }: { params: { id: string } }) {
                     color: 'primary.contrastText',
                     textAlign: 'center',
                     p: 4,
+                    boxShadow: 4,
                   }}
                 >
+                  <LockIcon sx={{ fontSize: 48, mb: 2, opacity: 0.9 }} />
                   <Typography variant="h5" fontWeight={600} gutterBottom>
                     {t('blog.upgradeRequired')}
                   </Typography>
@@ -293,14 +368,14 @@ function BlogDetailPage({ params }: { params: { id: string } }) {
                     color="secondary"
                     size="large"
                     onClick={() => setPremiumModalOpen(true)}
-                    sx={{ textTransform: 'none' }}
+                    sx={{ textTransform: 'none', px: 4 }}
                   >
                     {t('profile.upgradePlan')}
                   </Button>
                 </Card>
               </Box>
             ) : (
-              <Typography variant="body1" sx={{ whiteSpace: 'pre-line', lineHeight: 1.8 }}>
+              <Typography variant="body1" sx={{ whiteSpace: 'pre-line', lineHeight: 1.8, mt: 2 }}>
                 {remainingContent}
               </Typography>
             )}
@@ -313,7 +388,7 @@ function BlogDetailPage({ params }: { params: { id: string } }) {
   );
 }
 
-export default function ProtectedBlogDetail({ params }: { params: { id: string } }) {
+export default function ProtectedBlogDetail({ params }: { params: Promise<{ id: string }> | { id: string } }) {
   return (
     <ProtectedRoute>
       <BlogDetailPage params={params} />

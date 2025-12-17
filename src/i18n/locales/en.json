@@ -14,7 +14,8 @@
     "confirm": "Confirm",
     "close": "Close",
     "loading": "Loading...",
-    "noData": "No data available"
+    "noData": "No data available",
+    "actions": "Actions"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -30,7 +31,10 @@
     "avgMonthlyExpense": "Avg Monthly Expense",
     "topCategory": "Top Category",
     "totalTransactions": "Total Transactions",
-    "noExpenseData": "No expense data available"
+    "noExpenseData": "No expense data available",
+    "budgetExceeded": "Budget Exceeded!",
+    "andMore": "and",
+    "more": "more"
   },
   "transactions": {
     "title": "Transactions",
@@ -60,7 +64,24 @@
     "asc": "Ascending",
     "showing": "Showing",
     "page": "Page",
-    "of": "of"
+    "of": "of",
+    "cardView": "Cards",
+    "tableView": "Table",
+    "import": "Import",
+    "export": "Export",
+    "exportSuccess": "Transactions exported successfully",
+    "importTransactions": "Import Transactions",
+    "importInstructions": "Upload a CSV file with columns: Date, Type, Category, Amount, Description",
+    "preview": "Preview",
+    "transactions": "transactions",
+    "importErrors": "Errors found",
+    "importSuccess": "Successfully imported transactions",
+    "importConfirm": "Import",
+    "row": "Row",
+    "insufficientColumns": "Insufficient columns",
+    "invalidData": "Invalid data",
+    "invalidType": "Type must be 'income' or 'expense'",
+    "importEmptyFile": "File is empty"
   },
   "budgets": {
     "title": "Budgets",
@@ -115,7 +136,8 @@
     "features": "Features",
     "pricing": "Pricing",
     "contact": "Contact",
-    "about": "About"
+    "about": "About",
+    "home": "Home"
   },
   "footer": {
     "description": "Take control of your finances with our powerful and intuitive finance tracker.",
@@ -291,6 +313,9 @@
     "subtitle": "Expert tips and insights to help you manage your finances better",
     "backToBlog": "Back to Blog",
     "upgradeRequired": "Upgrade Required",
-    "upgradeMessage": "Full access to our blog articles is available with Standard or Premium plans. Upgrade now to read complete articles and access exclusive content!"
+    "upgradeMessage": "Full access to our blog articles is available with Standard or Premium plans. Upgrade now to read complete articles and access exclusive content!",
+    "articleNotFound": "Article Not Found",
+    "articleNotFoundMessage": "The article you are looking for does not exist.",
+    "basicPlanRestriction": "This article is available for Standard and Premium plans only"
   }
 }

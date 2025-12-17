@@ -23,6 +23,9 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import SettingsIcon from '@mui/icons-material/Settings';
+import HomeIcon from '@mui/icons-material/Home';
+import PersonIcon from '@mui/icons-material/Person';
+import ArticleIcon from '@mui/icons-material/Article';
 import { useTranslation } from 'react-i18next';
 
 const drawerWidth = 240;
@@ -39,11 +42,17 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const { t } = useTranslation();
 
-  const menuItems = [
+  const mainMenuItems = [
     { text: t('common.dashboard'), icon: <DashboardIcon />, path: '/dashboard' },
     { text: t('common.transactions'), icon: <ReceiptIcon />, path: '/transactions' },
     { text: t('common.budgets'), icon: <AccountBalanceWalletIcon />, path: '/budgets' },
+  ];
+
+  const secondaryMenuItems = [
+    { text: t('nav.blog'), icon: <ArticleIcon />, path: '/blog' },
+    { text: t('nav.profile'), icon: <PersonIcon />, path: '/profile' },
     { text: t('common.settings'), icon: <SettingsIcon />, path: '/settings' },
+    { text: t('nav.home') || 'Home', icon: <HomeIcon />, path: '/' },
   ];
 
   const handleDrawerToggle = () => {
@@ -66,11 +75,49 @@ export default function AppLayout({ children }: AppLayoutProps) {
       </Toolbar>
       <Divider />
       <List>
-        {menuItems.map((item) => (
+        {mainMenuItems.map((item) => (
           <ListItem key={item.path} disablePadding>
             <ListItemButton
               selected={pathname === item.path}
               onClick={() => handleNavigation(item.path)}
+              sx={{
+                '&.Mui-selected': {
+                  bgcolor: 'primary.main',
+                  color: 'primary.contrastText',
+                  '&:hover': {
+                    bgcolor: 'primary.dark',
+                  },
+                  '& .MuiListItemIcon-root': {
+                    color: 'primary.contrastText',
+                  },
+                },
+              }}
+            >
+              <ListItemIcon>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.text} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
+      <Divider sx={{ my: 1 }} />
+      <List>
+        {secondaryMenuItems.map((item) => (
+          <ListItem key={item.path} disablePadding>
+            <ListItemButton
+              selected={pathname === item.path}
+              onClick={() => handleNavigation(item.path)}
+              sx={{
+                '&.Mui-selected': {
+                  bgcolor: 'primary.main',
+                  color: 'primary.contrastText',
+                  '&:hover': {
+                    bgcolor: 'primary.dark',
+                  },
+                  '& .MuiListItemIcon-root': {
+                    color: 'primary.contrastText',
+                  },
+                },
+              }}
             >
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} />
@@ -101,7 +148,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            {menuItems.find((item) => item.path === pathname)?.text || t('common.appName')}
+            {[...mainMenuItems, ...secondaryMenuItems].find((item) => item.path === pathname)?.text || t('common.appName')}
           </Typography>
         </Toolbar>
       </AppBar>

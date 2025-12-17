@@ -16,7 +16,6 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  MenuItem,
   Chip,
   Alert,
   Snackbar,
@@ -27,6 +26,19 @@ import {
   InputLabel,
   Stack,
   Pagination,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  ToggleButton,
+  ToggleButtonGroup,
+  Menu,
+  ListItemIcon,
+  ListItemText,
+  DialogContentText,
+  MenuItem,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -35,6 +47,11 @@ import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import DownloadIcon from '@mui/icons-material/Download';
 import ClearIcon from '@mui/icons-material/Clear';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
+import TableChartIcon from '@mui/icons-material/TableChart';
+import ViewListIcon from '@mui/icons-material/ViewList';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import DescriptionIcon from '@mui/icons-material/Description';
 import { useTranslation } from 'react-i18next';
 import { useFinanceStore } from '@/store/financeStore';
 import { Transaction, TransactionType } from '@/types';
@@ -74,6 +91,12 @@ function TransactionsPage() {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
+  const [viewMode, setViewMode] = useState<'card' | 'table'>('card');
+  const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(null);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [importPreview, setImportPreview] = useState<any[]>([]);
+  const [importErrors, setImportErrors] = useState<string[]>([]);
 
   const [formData, setFormData] = useState<Omit<Transaction, 'id'>>({
     type: 'expense',
@@ -115,20 +138,38 @@ function TransactionsPage() {
     setErrors({});
   };
 
+  // Real-time validation
+  const validateField = (field: keyof typeof formData, value: any): string | undefined => {
+    switch (field) {
+      case 'amount':
+        if (!value || value <= 0) {
+          return t('transactions.invalidAmount');
+        }
+        break;
+      case 'category':
+        if (!value) {
+          return t('transactions.required');
+        }
+        break;
+      case 'date':
+        if (!value) {
+          return t('transactions.required');
+        }
+        break;
+    }
+    return undefined;
+  };
+
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof typeof formData, string>> = {};
 
-    if (formData.amount <= 0) {
-      newErrors.amount = t('transactions.invalidAmount');
-    }
-
-    if (!formData.category) {
-      newErrors.category = t('transactions.required');
-    }
-
-    if (!formData.date) {
-      newErrors.date = t('transactions.required');
-    }
+    Object.keys(formData).forEach((key) => {
+      const field = key as keyof typeof formData;
+      const error = validateField(field, formData[field]);
+      if (error) {
+        newErrors[field] = error;
+      }
+    });
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -241,8 +282,65 @@ function TransactionsPage() {
     link.download = `transactions-${new Date().toISOString().split('T')[0]}.csv`;
     link.click();
     URL.revokeObjectURL(url);
-    setSnackbarMessage('Transactions exported to CSV successfully');
+    setSnackbarMessage(t('transactions.exportSuccess') || 'Transactions exported successfully');
     setSnackbarOpen(true);
+    setExportMenuAnchor(null);
+  };
+
+  const handleExportExcel = () => {
+    // For Excel, we'll create a CSV with Excel-compatible format
+    handleExportCSV();
+  };
+
+  const handleExportPDF = () => {
+    // Simple PDF export using window.print or a library
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      const htmlContent = `
+        <html>
+          <head>
+            <title>Transactions Report</title>
+            <style>
+              body { font-family: Arial, sans-serif; padding: 20px; }
+              table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+              th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+              th { background-color: #1976d2; color: white; }
+              tr:nth-child(even) { background-color: #f2f2f2; }
+            </style>
+          </head>
+          <body>
+            <h1>Transactions Report</h1>
+            <p>Generated: ${new Date().toLocaleDateString()}</p>
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Type</th>
+                  <th>Category</th>
+                  <th>Amount</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${filteredAndSortedTransactions.map((t) => `
+                  <tr>
+                    <td>${new Date(t.date).toLocaleDateString()}</td>
+                    <td>${t.type}</td>
+                    <td>${translateCategory(t.category)}</td>
+                    <td>${formatCurrency(t.amount, currency)}</td>
+                    <td>${t.description || ''}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </body>
+        </html>
+      `;
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+      printWindow.print();
+    }
+    setExportMenuAnchor(null);
   };
 
   const clearFilters = () => {
@@ -266,29 +364,105 @@ function TransactionsPage() {
     setPage(1);
   }, [searchQuery, filterType, filterCategory, filterDateFrom, filterDateTo, sortBy, sortOrder]);
 
+  const handleFileImport = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target?.result as string;
+      const lines = text.split('\n').filter((line) => line.trim());
+      if (lines.length === 0) {
+        setImportErrors([t('transactions.importEmptyFile') || 'File is empty']);
+        return;
+      }
+      
+      const headers = lines[0].split(',').map((h) => h.trim().replace(/"/g, ''));
+      
+      const preview: any[] = [];
+      const errors: string[] = [];
+      
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map((v) => v.trim().replace(/"/g, ''));
+        if (values.length < 4) {
+          errors.push(`${t('transactions.row') || 'Row'} ${i + 1}: ${t('transactions.insufficientColumns') || 'Insufficient columns'}`);
+          continue;
+        }
+        
+        const dateIndex = headers.findIndex((h) => h.toLowerCase().includes('date'));
+        const typeIndex = headers.findIndex((h) => h.toLowerCase().includes('type'));
+        const categoryIndex = headers.findIndex((h) => h.toLowerCase().includes('category'));
+        const amountIndex = headers.findIndex((h) => h.toLowerCase().includes('amount'));
+        const descIndex = headers.findIndex((h) => h.toLowerCase().includes('description'));
+        
+        const date = values[dateIndex] || values[0];
+        const type = (values[typeIndex] || values[1]).toLowerCase();
+        const category = values[categoryIndex] || values[2];
+        const amount = parseFloat(values[amountIndex] || values[3]);
+        const description = values[descIndex] || values[4] || '';
+        
+        if (!date || !type || !category || isNaN(amount)) {
+          errors.push(`${t('transactions.row') || 'Row'} ${i + 1}: ${t('transactions.invalidData') || 'Invalid data'}`);
+          continue;
+        }
+        
+        if (type !== 'income' && type !== 'expense') {
+          errors.push(`${t('transactions.row') || 'Row'} ${i + 1}: ${t('transactions.invalidType') || "Type must be 'income' or 'expense'"}`);
+          continue;
+        }
+        
+        preview.push({
+          date,
+          type,
+          category,
+          amount,
+          description,
+        });
+      }
+      
+      setImportPreview(preview);
+      setImportErrors(errors);
+    };
+    reader.readAsText(file);
+  };
+
   return (
     <Container maxWidth="lg">
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h4" fontWeight={700}>
           {t('transactions.title')}
         </Typography>
-        <Stack direction="row" spacing={2}>
+        <Stack direction="row" spacing={2} alignItems="center">
+          <ToggleButtonGroup
+            value={viewMode}
+            exclusive
+            onChange={(_, newMode) => newMode && setViewMode(newMode)}
+            size="small"
+          >
+            <ToggleButton value="card">
+              <ViewListIcon sx={{ mr: 1 }} />
+              {t('transactions.cardView') || 'Cards'}
+            </ToggleButton>
+            <ToggleButton value="table">
+              <TableChartIcon sx={{ mr: 1 }} />
+              {t('transactions.tableView') || 'Table'}
+            </ToggleButton>
+          </ToggleButtonGroup>
+          
+          <Button
+            variant="outlined"
+            startIcon={<UploadFileIcon />}
+            onClick={() => setImportDialogOpen(true)}
+          >
+            {t('transactions.import') || 'Import'}
+          </Button>
+          
           <Button
             variant="outlined"
             startIcon={<DownloadIcon />}
-            onClick={handleExportCSV}
+            onClick={(e) => setExportMenuAnchor(e.currentTarget)}
             disabled={filteredAndSortedTransactions.length === 0}
           >
-            CSV
+            {t('transactions.export') || 'Export'}
           </Button>
-          <Button
-            variant="outlined"
-            startIcon={<DownloadIcon />}
-            onClick={handleExport}
-            disabled={filteredAndSortedTransactions.length === 0}
-          >
-            JSON
-          </Button>
+          
           <Button
             variant="contained"
             startIcon={<AddIcon />}
@@ -446,59 +620,131 @@ function TransactionsPage() {
               </Typography>
             )}
           </Box>
-          <Grid container spacing={2}>
-            {paginatedTransactions.map((transaction) => (
-            <Grid size={{ xs: 12 }} key={transaction.id}>
-              <Card>
-                <CardContent>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Box sx={{ flex: 1 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+          {viewMode === 'card' ? (
+            <Grid container spacing={2}>
+              {paginatedTransactions.map((transaction) => (
+                <Grid size={{ xs: 12 }} key={transaction.id}>
+                  <Card
+                    sx={{
+                      transition: 'all 0.2s ease-in-out',
+                      '&:hover': {
+                        transform: 'translateY(-2px)',
+                        boxShadow: 4,
+                      },
+                    }}
+                  >
+                    <CardContent>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Box sx={{ flex: 1 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                            <Chip
+                              label={t(`transactions.${transaction.type}`)}
+                              color={transaction.type === 'income' ? 'success' : 'error'}
+                              size="small"
+                            />
+                            <Typography variant="subtitle1" fontWeight={600}>
+                              {transaction.description || translateCategory(transaction.category)}
+                            </Typography>
+                          </Box>
+                          <Typography variant="body2" color="text.secondary">
+                            {translateCategory(transaction.category)} • {new Date(transaction.date).toLocaleDateString()}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Typography
+                            variant="h6"
+                            fontWeight={700}
+                            sx={{
+                              color: transaction.type === 'income' ? 'success.main' : 'error.main',
+                            }}
+                          >
+                            {transaction.type === 'income' ? '+' : '-'}
+                            {formatCurrency(transaction.amount, currency)}
+                          </Typography>
+                          <IconButton
+                            color="primary"
+                            onClick={() => handleOpenDialog(transaction)}
+                            size="small"
+                          >
+                            <EditIcon />
+                          </IconButton>
+                          <IconButton
+                            color="error"
+                            onClick={() => handleDeleteClick(transaction.id)}
+                            size="small"
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </Box>
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          ) : (
+            <TableContainer component={Paper} sx={{ mt: 2 }}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell><strong>{t('transactions.date')}</strong></TableCell>
+                    <TableCell><strong>{t('transactions.type')}</strong></TableCell>
+                    <TableCell><strong>{t('transactions.category')}</strong></TableCell>
+                    <TableCell><strong>{t('transactions.description')}</strong></TableCell>
+                    <TableCell align="right"><strong>{t('transactions.amount')}</strong></TableCell>
+                    <TableCell align="center"><strong>{t('common.actions') || 'Actions'}</strong></TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {paginatedTransactions.map((transaction) => (
+                    <TableRow
+                      key={transaction.id}
+                      sx={{
+                        '&:hover': { bgcolor: 'action.hover' },
+                      }}
+                    >
+                      <TableCell>{new Date(transaction.date).toLocaleDateString()}</TableCell>
+                      <TableCell>
                         <Chip
                           label={t(`transactions.${transaction.type}`)}
                           color={transaction.type === 'income' ? 'success' : 'error'}
                           size="small"
                         />
-                        <Typography variant="subtitle1" fontWeight={600}>
-                          {transaction.description || translateCategory(transaction.category)}
-                        </Typography>
-                      </Box>
-                      <Typography variant="body2" color="text.secondary">
-                        {translateCategory(transaction.category)} • {new Date(transaction.date).toLocaleDateString()}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Typography
-                        variant="h6"
-                        fontWeight={700}
+                      </TableCell>
+                      <TableCell>{translateCategory(transaction.category)}</TableCell>
+                      <TableCell>{transaction.description || '-'}</TableCell>
+                      <TableCell
+                        align="right"
                         sx={{
                           color: transaction.type === 'income' ? 'success.main' : 'error.main',
+                          fontWeight: 600,
                         }}
                       >
                         {transaction.type === 'income' ? '+' : '-'}
                         {formatCurrency(transaction.amount, currency)}
-                      </Typography>
-                      <IconButton
-                        color="primary"
-                        onClick={() => handleOpenDialog(transaction)}
-                        size="small"
-                      >
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton
-                        color="error"
-                        onClick={() => handleDeleteClick(transaction.id)}
-                        size="small"
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Box>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+                      </TableCell>
+                      <TableCell align="center">
+                        <IconButton
+                          color="primary"
+                          onClick={() => handleOpenDialog(transaction)}
+                          size="small"
+                        >
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton
+                          color="error"
+                          onClick={() => handleDeleteClick(transaction.id)}
+                          size="small"
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
         {totalPages > 1 && (
           <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
             <Pagination
@@ -541,8 +787,15 @@ function TransactionsPage() {
               label={t('transactions.amount')}
               value={formData.amount || ''}
               onChange={(e) => {
-                setFormData({ ...formData, amount: parseFloat(e.target.value) || 0 });
-                setErrors({ ...errors, amount: undefined });
+                const value = parseFloat(e.target.value) || 0;
+                setFormData({ ...formData, amount: value });
+                const error = validateField('amount', value);
+                setErrors({ ...errors, amount: error });
+              }}
+              onBlur={(e) => {
+                const value = parseFloat(e.target.value) || 0;
+                const error = validateField('amount', value);
+                setErrors({ ...errors, amount: error });
               }}
               fullWidth
               inputProps={{ min: 0, step: 0.01 }}
@@ -556,7 +809,12 @@ function TransactionsPage() {
               value={formData.category}
               onChange={(e) => {
                 setFormData({ ...formData, category: e.target.value });
-                setErrors({ ...errors, category: undefined });
+                const error = validateField('category', e.target.value);
+                setErrors({ ...errors, category: error });
+              }}
+              onBlur={() => {
+                const error = validateField('category', formData.category);
+                setErrors({ ...errors, category: error });
               }}
               fullWidth
               error={!!errors.category}
@@ -575,7 +833,12 @@ function TransactionsPage() {
               value={formData.date}
               onChange={(e) => {
                 setFormData({ ...formData, date: e.target.value });
-                setErrors({ ...errors, date: undefined });
+                const error = validateField('date', e.target.value);
+                setErrors({ ...errors, date: error });
+              }}
+              onBlur={() => {
+                const error = validateField('date', formData.date);
+                setErrors({ ...errors, date: error });
               }}
               fullWidth
               InputLabelProps={{ shrink: true }}
@@ -612,6 +875,141 @@ function TransactionsPage() {
           setTransactionToDelete(null);
         }}
       />
+
+      {/* Export Menu */}
+      <Menu
+        anchorEl={exportMenuAnchor}
+        open={Boolean(exportMenuAnchor)}
+        onClose={() => setExportMenuAnchor(null)}
+      >
+        <MenuItem onClick={handleExportCSV}>
+          <ListItemIcon>
+            <DescriptionIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>CSV</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={handleExport}>
+          <ListItemIcon>
+            <DescriptionIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>JSON</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={handleExportExcel}>
+          <ListItemIcon>
+            <DescriptionIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Excel (CSV)</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={handleExportPDF}>
+          <ListItemIcon>
+            <PictureAsPdfIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>PDF</ListItemText>
+        </MenuItem>
+      </Menu>
+
+      {/* Import Dialog */}
+      <Dialog open={importDialogOpen} onClose={() => setImportDialogOpen(false)} maxWidth="md" fullWidth>
+        <DialogTitle>{t('transactions.importTransactions') || 'Import Transactions'}</DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ mb: 2 }}>
+            {t('transactions.importInstructions') || 'Upload a CSV file with columns: Date, Type, Category, Amount, Description'}
+          </DialogContentText>
+          <Box sx={{ mb: 2 }}>
+            <input
+              type="file"
+              accept=".csv"
+              onChange={(e) => {
+                const file = (e.target as HTMLInputElement).files?.[0];
+                if (file) {
+                  setImportFile(file);
+                  handleFileImport(file);
+                } else {
+                  setImportPreview([]);
+                  setImportErrors([]);
+                }
+              }}
+              style={{ width: '100%', padding: '8px' }}
+            />
+          </Box>
+          {importPreview.length > 0 && (
+            <Box sx={{ mt: 3 }}>
+              <Typography variant="h6" gutterBottom>
+                {t('transactions.preview') || 'Preview'} ({importPreview.length} {t('transactions.transactions') || 'transactions'})
+              </Typography>
+              <TableContainer component={Paper} sx={{ maxHeight: 300, mt: 2 }}>
+                <Table size="small" stickyHeader>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Date</TableCell>
+                      <TableCell>Type</TableCell>
+                      <TableCell>Category</TableCell>
+                      <TableCell align="right">Amount</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {importPreview.slice(0, 10).map((row, idx) => (
+                      <TableRow key={idx}>
+                        <TableCell>{row.date}</TableCell>
+                        <TableCell>{row.type}</TableCell>
+                        <TableCell>{row.category}</TableCell>
+                        <TableCell align="right">{formatCurrency(row.amount, currency)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              {importErrors.length > 0 && (
+                <Alert severity="warning" sx={{ mt: 2 }}>
+                  <Typography variant="body2" fontWeight={600}>
+                    {t('transactions.importErrors') || 'Errors found:'}
+                  </Typography>
+                  <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
+                    {importErrors.map((error, idx) => (
+                      <li key={idx}>{error}</li>
+                    ))}
+                  </ul>
+                </Alert>
+              )}
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => {
+            setImportDialogOpen(false);
+            setImportFile(null);
+            setImportPreview([]);
+            setImportErrors([]);
+          }}>
+            {t('common.cancel')}
+          </Button>
+          <Button
+            variant="contained"
+            onClick={() => {
+              if (importPreview.length > 0) {
+                importPreview.forEach((transaction) => {
+                  addTransaction({
+                    type: transaction.type,
+                    amount: transaction.amount,
+                    category: transaction.category,
+                    date: transaction.date,
+                    description: transaction.description || '',
+                  });
+                });
+                setSnackbarMessage(t('transactions.importSuccess') || `Successfully imported ${importPreview.length} transactions`);
+                setSnackbarOpen(true);
+                setImportDialogOpen(false);
+                setImportFile(null);
+                setImportPreview([]);
+                setImportErrors([]);
+              }
+            }}
+            disabled={importPreview.length === 0}
+          >
+            {t('transactions.importConfirm') || 'Import'}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Snackbar for feedback */}
       <Snackbar
