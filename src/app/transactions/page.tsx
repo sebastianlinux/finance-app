@@ -52,6 +52,13 @@ import TableChartIcon from '@mui/icons-material/TableChart';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import DescriptionIcon from '@mui/icons-material/Description';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import ViewCompactIcon from '@mui/icons-material/ViewCompact';
+import ViewAgendaIcon from '@mui/icons-material/ViewAgenda';
+import SaveIcon from '@mui/icons-material/Save';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { useTranslation } from 'react-i18next';
 import { useFinanceStore } from '@/store/financeStore';
 import { Transaction, TransactionType } from '@/types';
@@ -89,9 +96,14 @@ function TransactionsPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState<'date' | 'amount' | 'category'>('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [multiSort, setMultiSort] = useState<Array<{ field: 'date' | 'amount' | 'category'; order: 'asc' | 'desc' }>>([]);
+  const [savedFilters, setSavedFilters] = useState<Array<{ name: string; filters: any }>>([]);
+  const [saveFilterDialogOpen, setSaveFilterDialogOpen] = useState(false);
+  const [filterName, setFilterName] = useState('');
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
-  const [viewMode, setViewMode] = useState<'card' | 'table'>('card');
+  const [viewMode, setViewMode] = useState<'card' | 'table' | 'calendar' | 'compact'>('card');
+  const [compactMode, setCompactMode] = useState(false);
   const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(null);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [importFile, setImportFile] = useState<File | null>(null);
@@ -231,6 +243,25 @@ function TransactionsPage() {
       return true;
     })
     .sort((a, b) => {
+      // Multi-sort support
+      if (multiSort.length > 0) {
+        for (const sort of multiSort) {
+          let comparison = 0;
+          if (sort.field === 'date') {
+            comparison = new Date(a.date).getTime() - new Date(b.date).getTime();
+          } else if (sort.field === 'amount') {
+            comparison = a.amount - b.amount;
+          } else if (sort.field === 'category') {
+            comparison = a.category.localeCompare(b.category);
+          }
+          if (comparison !== 0) {
+            return sort.order === 'asc' ? comparison : -comparison;
+          }
+        }
+        return 0;
+      }
+
+      // Single sort (fallback)
       let comparison = 0;
       if (sortBy === 'date') {
         comparison = new Date(a.date).getTime() - new Date(b.date).getTime();
@@ -241,6 +272,55 @@ function TransactionsPage() {
       }
       return sortOrder === 'asc' ? comparison : -comparison;
     });
+
+  const handleAddSort = (field: 'date' | 'amount' | 'category') => {
+    const existingIndex = multiSort.findIndex((s) => s.field === field);
+    if (existingIndex >= 0) {
+      const newSort = [...multiSort];
+      newSort[existingIndex].order = newSort[existingIndex].order === 'asc' ? 'desc' : 'asc';
+      setMultiSort(newSort);
+    } else {
+      setMultiSort([...multiSort, { field, order: 'asc' }]);
+    }
+  };
+
+  const handleRemoveSort = (field: 'date' | 'amount' | 'category') => {
+    setMultiSort(multiSort.filter((s) => s.field !== field));
+  };
+
+  const handleSaveFilter = () => {
+    if (!filterName.trim()) return;
+    
+    const filterConfig = {
+      searchQuery,
+      filterType,
+      filterCategory,
+      filterDateFrom,
+      filterDateTo,
+      sortBy,
+      sortOrder,
+      multiSort,
+    };
+
+    setSavedFilters([...savedFilters, { name: filterName, filters: filterConfig }]);
+    setFilterName('');
+    setSaveFilterDialogOpen(false);
+    setSnackbarMessage(t('transactions.filterSaved') || 'Filter saved successfully');
+    setSnackbarOpen(true);
+  };
+
+  const handleLoadFilter = (filter: { name: string; filters: any }) => {
+    setSearchQuery(filter.filters.searchQuery || '');
+    setFilterType(filter.filters.filterType || 'all');
+    setFilterCategory(filter.filters.filterCategory || 'all');
+    setFilterDateFrom(filter.filters.filterDateFrom || '');
+    setFilterDateTo(filter.filters.filterDateTo || '');
+    setSortBy(filter.filters.sortBy || 'date');
+    setSortOrder(filter.filters.sortOrder || 'desc');
+    setMultiSort(filter.filters.multiSort || []);
+    setSnackbarMessage(t('transactions.filterLoaded') || 'Filter loaded successfully');
+    setSnackbarOpen(true);
+  };
 
   const categoryOptions = getCategoryKeys(formData.type).map((key) => ({
     value: key,
@@ -444,7 +524,23 @@ function TransactionsPage() {
               <TableChartIcon sx={{ mr: 1 }} />
               {t('transactions.tableView') || 'Table'}
             </ToggleButton>
+            <ToggleButton value="calendar">
+              <CalendarMonthIcon sx={{ mr: 1 }} />
+              {t('transactions.calendarView') || 'Calendar'}
+            </ToggleButton>
+            <ToggleButton value="compact">
+              <ViewCompactIcon sx={{ mr: 1 }} />
+              {t('transactions.compactView') || 'Compact'}
+            </ToggleButton>
           </ToggleButtonGroup>
+          
+          <IconButton
+            onClick={() => setCompactMode(!compactMode)}
+            color={compactMode ? 'primary' : 'default'}
+            title={compactMode ? t('transactions.expandView') || 'Expand View' : t('transactions.compactView') || 'Compact View'}
+          >
+            {compactMode ? <ViewAgendaIcon /> : <ViewCompactIcon />}
+          </IconButton>
           
           <Button
             variant="outlined"
@@ -620,39 +716,33 @@ function TransactionsPage() {
               </Typography>
             )}
           </Box>
-          {viewMode === 'card' ? (
-            <Grid container spacing={2}>
-              {paginatedTransactions.map((transaction) => (
-                <Grid size={{ xs: 12 }} key={transaction.id}>
-                  <Card
-                    sx={{
-                      transition: 'all 0.2s ease-in-out',
-                      '&:hover': {
-                        transform: 'translateY(-2px)',
-                        boxShadow: 4,
-                      },
-                    }}
-                  >
-                    <CardContent>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Box sx={{ flex: 1 }}>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                            <Chip
-                              label={t(`transactions.${transaction.type}`)}
-                              color={transaction.type === 'income' ? 'success' : 'error'}
-                              size="small"
-                            />
-                            <Typography variant="subtitle1" fontWeight={600}>
+          {viewMode === 'calendar' ? (
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="h6" gutterBottom>
+                {t('transactions.calendarView') || 'Calendar View'}
+              </Typography>
+              <Grid container spacing={1}>
+                {paginatedTransactions.map((transaction) => (
+                  <Grid size={{ xs: 12, sm: 6, md: 4 }} key={transaction.id}>
+                    <Card
+                      sx={{
+                        p: compactMode ? 1 : 2,
+                        transition: 'all 0.2s',
+                        '&:hover': { transform: 'translateY(-2px)', boxShadow: 2 },
+                      }}
+                    >
+                      <CardContent sx={{ p: compactMode ? '8px !important' : 2 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Box sx={{ flex: 1 }}>
+                            <Typography variant={compactMode ? 'body2' : 'subtitle2'} fontWeight={600}>
+                              {new Date(transaction.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            </Typography>
+                            <Typography variant={compactMode ? 'caption' : 'body2'} color="text.secondary">
                               {transaction.description || translateCategory(transaction.category)}
                             </Typography>
                           </Box>
-                          <Typography variant="body2" color="text.secondary">
-                            {translateCategory(transaction.category)} • {new Date(transaction.date).toLocaleDateString()}
-                          </Typography>
-                        </Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                           <Typography
-                            variant="h6"
+                            variant={compactMode ? 'body2' : 'h6'}
                             fontWeight={700}
                             sx={{
                               color: transaction.type === 'income' ? 'success.main' : 'error.main',
@@ -661,20 +751,73 @@ function TransactionsPage() {
                             {transaction.type === 'income' ? '+' : '-'}
                             {formatCurrency(transaction.amount, currency)}
                           </Typography>
-                          <IconButton
-                            color="primary"
-                            onClick={() => handleOpenDialog(transaction)}
-                            size="small"
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
+          ) : viewMode === 'card' ? (
+            <Grid container spacing={2}>
+              {paginatedTransactions.map((transaction) => (
+                <Grid size={{ xs: 12 }} key={transaction.id}>
+                  <Card
+                    sx={{
+                      transition: 'all 0.2s ease-in-out',
+                      p: compactMode ? 1 : 2,
+                      '&:hover': {
+                        transform: 'translateY(-2px)',
+                        boxShadow: 4,
+                      },
+                    }}
+                  >
+                    <CardContent sx={{ p: compactMode ? '8px !important' : 2 }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Box sx={{ flex: 1 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: compactMode ? 0.5 : 1 }}>
+                            <Chip
+                              label={t(`transactions.${transaction.type}`)}
+                              color={transaction.type === 'income' ? 'success' : 'error'}
+                              size="small"
+                            />
+                            <Typography variant={compactMode ? 'body2' : 'subtitle1'} fontWeight={600}>
+                              {transaction.description || translateCategory(transaction.category)}
+                            </Typography>
+                          </Box>
+                          <Typography variant={compactMode ? 'caption' : 'body2'} color="text.secondary">
+                            {translateCategory(transaction.category)} • {new Date(transaction.date).toLocaleDateString()}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <Typography
+                            variant={compactMode ? 'body2' : 'h6'}
+                            fontWeight={700}
+                            sx={{
+                              color: transaction.type === 'income' ? 'success.main' : 'error.main',
+                            }}
                           >
-                            <EditIcon />
-                          </IconButton>
-                          <IconButton
-                            color="error"
-                            onClick={() => handleDeleteClick(transaction.id)}
-                            size="small"
-                          >
-                            <DeleteIcon />
-                          </IconButton>
+                            {transaction.type === 'income' ? '+' : '-'}
+                            {formatCurrency(transaction.amount, currency)}
+                          </Typography>
+                          {!compactMode && (
+                            <>
+                              <IconButton
+                                color="primary"
+                                onClick={() => handleOpenDialog(transaction)}
+                                size="small"
+                              >
+                                <EditIcon />
+                              </IconButton>
+                              <IconButton
+                                color="error"
+                                onClick={() => handleDeleteClick(transaction.id)}
+                                size="small"
+                              >
+                                <DeleteIcon />
+                              </IconButton>
+                            </>
+                          )}
                         </Box>
                       </Box>
                     </CardContent>
@@ -682,26 +825,49 @@ function TransactionsPage() {
                 </Grid>
               ))}
             </Grid>
-          ) : (
+          ) : viewMode === 'table' ? (
             <TableContainer component={Paper} sx={{ mt: 2 }}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell><strong>{t('transactions.date')}</strong></TableCell>
-                    <TableCell><strong>{t('transactions.type')}</strong></TableCell>
-                    <TableCell><strong>{t('transactions.category')}</strong></TableCell>
-                    <TableCell><strong>{t('transactions.description')}</strong></TableCell>
-                    <TableCell align="right"><strong>{t('transactions.amount')}</strong></TableCell>
-                    <TableCell align="center"><strong>{t('common.actions') || 'Actions'}</strong></TableCell>
-                  </TableRow>
-                </TableHead>
+              <Table size={compactMode ? 'small' : 'medium'}>
+            <TableHead>
+              <TableRow>
+                <TableCell>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <strong>{t('transactions.date')}</strong>
+                    <IconButton size="small" onClick={() => handleAddSort('date')}>
+                      {multiSort.find((s) => s.field === 'date')?.order === 'asc' ? <ArrowUpwardIcon fontSize="small" /> : <ArrowDownwardIcon fontSize="small" />}
+                    </IconButton>
+                  </Box>
+                </TableCell>
+                <TableCell><strong>{t('transactions.type')}</strong></TableCell>
+                <TableCell>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <strong>{t('transactions.category')}</strong>
+                    <IconButton size="small" onClick={() => handleAddSort('category')}>
+                      {multiSort.find((s) => s.field === 'category')?.order === 'asc' ? <ArrowUpwardIcon fontSize="small" /> : <ArrowDownwardIcon fontSize="small" />}
+                    </IconButton>
+                  </Box>
+                </TableCell>
+                {!compactMode && <TableCell><strong>{t('transactions.description')}</strong></TableCell>}
+                <TableCell align="right">
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'flex-end' }}>
+                    <strong>{t('transactions.amount')}</strong>
+                    <IconButton size="small" onClick={() => handleAddSort('amount')}>
+                      {multiSort.find((s) => s.field === 'amount')?.order === 'asc' ? <ArrowUpwardIcon fontSize="small" /> : <ArrowDownwardIcon fontSize="small" />}
+                    </IconButton>
+                  </Box>
+                </TableCell>
+                {!compactMode && <TableCell align="center"><strong>{t('common.actions') || 'Actions'}</strong></TableCell>}
+              </TableRow>
+            </TableHead>
                 <TableBody>
                   {paginatedTransactions.map((transaction) => (
                     <TableRow
                       key={transaction.id}
                       sx={{
                         '&:hover': { bgcolor: 'action.hover' },
+                        cursor: 'pointer',
                       }}
+                      onClick={() => !compactMode && handleOpenDialog(transaction)}
                     >
                       <TableCell>{new Date(transaction.date).toLocaleDateString()}</TableCell>
                       <TableCell>
@@ -712,7 +878,7 @@ function TransactionsPage() {
                         />
                       </TableCell>
                       <TableCell>{translateCategory(transaction.category)}</TableCell>
-                      <TableCell>{transaction.description || '-'}</TableCell>
+                      {!compactMode && <TableCell>{transaction.description || '-'}</TableCell>}
                       <TableCell
                         align="right"
                         sx={{
@@ -723,27 +889,69 @@ function TransactionsPage() {
                         {transaction.type === 'income' ? '+' : '-'}
                         {formatCurrency(transaction.amount, currency)}
                       </TableCell>
-                      <TableCell align="center">
-                        <IconButton
-                          color="primary"
-                          onClick={() => handleOpenDialog(transaction)}
-                          size="small"
-                        >
-                          <EditIcon />
-                        </IconButton>
-                        <IconButton
-                          color="error"
-                          onClick={() => handleDeleteClick(transaction.id)}
-                          size="small"
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </TableCell>
+                      {!compactMode && (
+                        <TableCell align="center">
+                          <IconButton
+                            color="primary"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenDialog(transaction);
+                            }}
+                            size="small"
+                          >
+                            <EditIcon />
+                          </IconButton>
+                          <IconButton
+                            color="error"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteClick(transaction.id);
+                            }}
+                            size="small"
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
             </TableContainer>
+          ) : (
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                {t('transactions.compactViewDesc') || 'Compact view shows essential information only'}
+              </Typography>
+              <Grid container spacing={1}>
+                {paginatedTransactions.map((transaction) => (
+                  <Grid size={{ xs: 12 }} key={transaction.id}>
+                    <Card sx={{ p: 1 }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Typography variant="caption" color="text.secondary" sx={{ minWidth: 80 }}>
+                          {new Date(transaction.date).toLocaleDateString()}
+                        </Typography>
+                        <Typography variant="body2" sx={{ flex: 1, mx: 1 }}>
+                          {transaction.description || translateCategory(transaction.category)}
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          fontWeight={700}
+                          sx={{
+                            color: transaction.type === 'income' ? 'success.main' : 'error.main',
+                            minWidth: 100,
+                            textAlign: 'right',
+                          }}
+                        >
+                          {transaction.type === 'income' ? '+' : '-'}
+                          {formatCurrency(transaction.amount, currency)}
+                        </Typography>
+                      </Box>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
           )}
         {totalPages > 1 && (
           <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
@@ -1012,6 +1220,36 @@ function TransactionsPage() {
       </Dialog>
 
       {/* Snackbar for feedback */}
+      {/* Save Filter Dialog */}
+      <Dialog open={saveFilterDialogOpen} onClose={() => setSaveFilterDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>{t('transactions.saveFilter') || 'Save Filter'}</DialogTitle>
+        <DialogContent>
+          <TextField
+            fullWidth
+            label={t('transactions.filterName') || 'Filter Name'}
+            value={filterName}
+            onChange={(e) => setFilterName(e.target.value)}
+            sx={{ mt: 2 }}
+            autoFocus
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => {
+            setSaveFilterDialogOpen(false);
+            setFilterName('');
+          }}>
+            {t('common.cancel')}
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleSaveFilter}
+            disabled={!filterName.trim()}
+          >
+            {t('common.save')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={3000}

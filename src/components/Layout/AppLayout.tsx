@@ -37,6 +37,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/authStore';
 import { useFinanceStore } from '@/store/financeStore';
 import LanguageModal from '@/components/common/LanguageModal';
+import AlertsPanel from '@/components/common/AlertsPanel';
 
 const drawerWidth = 240;
 
@@ -62,10 +63,15 @@ export default function AppLayout({ children }: AppLayoutProps) {
     { text: t('common.dashboard'), icon: <DashboardIcon />, path: '/dashboard' },
     { text: t('common.transactions'), icon: <ReceiptIcon />, path: '/transactions' },
     { text: t('common.budgets'), icon: <AccountBalanceWalletIcon />, path: '/budgets' },
+    { text: t('nav.recurring') || 'Recurring', icon: <ReceiptIcon />, path: '/recurring' },
   ];
 
   const secondaryMenuItems = [
     { text: t('nav.blog'), icon: <ArticleIcon />, path: '/blog' },
+    { text: t('nav.reports') || 'Reports', icon: <ArticleIcon />, path: '/reports' },
+    { text: t('nav.goals') || 'Goals', icon: <ArticleIcon />, path: '/goals' },
+    { text: t('nav.customCategories') || 'Categories', icon: <ArticleIcon />, path: '/categories' },
+    { text: t('nav.support') || 'Support', icon: <ArticleIcon />, path: '/support' },
     { text: t('nav.profile'), icon: <PersonIcon />, path: '/profile' },
     { text: t('common.settings'), icon: <SettingsIcon />, path: '/settings' },
     { text: t('nav.home') || 'Home', icon: <HomeIcon />, path: '/' },
@@ -218,6 +224,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
             >
               <LanguageIcon />
             </IconButton>
+
+            {/* Alerts Panel */}
+            <AlertsPanel />
 
             {/* Profile Menu */}
             <IconButton onClick={handleMenuOpen} color="inherit">

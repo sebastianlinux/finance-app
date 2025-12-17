@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Container,
   Typography,
@@ -13,13 +13,26 @@ import {
   Chip,
   Alert,
   Divider,
+  Tabs,
+  Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  IconButton,
 } from '@mui/material';
+import DownloadIcon from '@mui/icons-material/Download';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/authStore';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import AppLayout from '@/components/Layout/AppLayout';
 import PremiumModal from '@/components/PremiumModal';
+import ConfirmDialog from '@/components/common/ConfirmDialog';
 import { PlanType } from '@/types';
+import { formatCurrency } from '@/utils/format';
 
 function ProfilePage() {
   const { t } = useTranslation();
@@ -35,6 +48,31 @@ function ProfilePage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [premiumModalOpen, setPremiumModalOpen] = useState(false);
+  const [selectedPlanToUpgrade, setSelectedPlanToUpgrade] = useState<'standard' | 'premium' | null>(null);
+  const [tabValue, setTabValue] = useState(0);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  
+  // Get store data directly
+  const allPayments = useAuthStore((state) => state.payments);
+  const allInvoices = useAuthStore((state) => state.invoices);
+  const allSubscriptions = useAuthStore((state) => state.subscriptions);
+  const cancelSubscription = useAuthStore((state) => state.cancelSubscription);
+  
+  // Filter data based on current user
+  const payments = useMemo(() => {
+    return allPayments.filter((p) => p.userId === user?.id);
+  }, [allPayments, user?.id]);
+  
+  const invoices = useMemo(() => {
+    return allInvoices.filter((i) => i.userId === user?.id);
+  }, [allInvoices, user?.id]);
+  
+  const currentSubscription = useMemo(() => {
+    if (!user) return null;
+    return allSubscriptions.find(
+      (s) => s.userId === user.id && s.status === 'active'
+    ) || null;
+  }, [allSubscriptions, user]);
 
   const planLabels: Record<PlanType, string> = {
     basic: t('profile.planBasic'),
@@ -78,11 +116,6 @@ function ProfilePage() {
     setLoading(false);
     setSuccess(true);
     setTimeout(() => setSuccess(false), 3000);
-  };
-
-  const handleUpgradeClick = () => {
-    if (user?.plan === 'premium') return;
-    setPremiumModalOpen(true);
   };
 
   return (
@@ -191,15 +224,46 @@ function ProfilePage() {
                 </Typography>
               </Box>
 
-              {user?.plan !== 'premium' && (
+              {user?.plan === 'basic' && (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 2 }}>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    color="primary"
+                    onClick={() => {
+                      setSelectedPlanToUpgrade('standard');
+                      setPremiumModalOpen(true);
+                    }}
+                    sx={{ textTransform: 'none' }}
+                  >
+                    {t('profile.upgradeToStandard') || 'Upgrade to Standard'}
+                  </Button>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    color="success"
+                    onClick={() => {
+                      setSelectedPlanToUpgrade('premium');
+                      setPremiumModalOpen(true);
+                    }}
+                    sx={{ textTransform: 'none' }}
+                  >
+                    {t('profile.upgradeToPremium') || 'Upgrade to Premium'}
+                  </Button>
+                </Box>
+              )}
+              {user?.plan === 'standard' && (
                 <Button
                   fullWidth
                   variant="outlined"
                   color="success"
-                  onClick={handleUpgradeClick}
+                  onClick={() => {
+                    setSelectedPlanToUpgrade('premium');
+                    setPremiumModalOpen(true);
+                  }}
                   sx={{ textTransform: 'none', mt: 2 }}
                 >
-                  {t('profile.upgradePlan')}
+                  {t('profile.upgradeToPremium') || 'Upgrade to Premium'}
                 </Button>
               )}
             </CardContent>
@@ -207,9 +271,183 @@ function ProfilePage() {
         </Grid>
       </Grid>
 
+      {/* Subscription & Payments Section */}
+      {(user?.plan === 'standard' || user?.plan === 'premium') && (
+        <Card sx={{ mt: 3 }}>
+          <CardContent>
+            <Tabs value={tabValue} onChange={(_, newValue) => setTabValue(newValue)} sx={{ mb: 3 }}>
+              <Tab label={t('profile.subscription') || 'Subscription'} />
+              <Tab label={t('profile.paymentHistory') || 'Payment History'} />
+              <Tab label={t('profile.invoices') || 'Invoices'} />
+            </Tabs>
+
+            {tabValue === 0 && currentSubscription && (
+              <Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                  <Box>
+                    <Typography variant="h6" fontWeight={600}>
+                      {planLabels[currentSubscription.plan]}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {t('profile.status') || 'Status'}: {currentSubscription.status}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {t('profile.renewalDate') || 'Renewal Date'}: {new Date(currentSubscription.renewalDate).toLocaleDateString()}
+                    </Typography>
+                  </Box>
+                  {currentSubscription.status === 'active' && (
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      onClick={() => setCancelDialogOpen(true)}
+                      sx={{ textTransform: 'none' }}
+                    >
+                      {t('profile.cancelSubscription') || 'Cancel Subscription'}
+                    </Button>
+                  )}
+                </Box>
+              </Box>
+            )}
+
+            {tabValue === 1 && (
+              <TableContainer component={Paper} variant="outlined">
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell><strong>{t('profile.date') || 'Date'}</strong></TableCell>
+                      <TableCell><strong>{t('profile.plan')}</strong></TableCell>
+                      <TableCell align="right"><strong>{t('profile.amount') || 'Amount'}</strong></TableCell>
+                      <TableCell><strong>{t('profile.status') || 'Status'}</strong></TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {payments.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={4} align="center">
+                          <Typography color="text.secondary" sx={{ py: 2 }}>
+                            {t('profile.noPayments') || 'No payments found'}
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      payments.map((payment) => (
+                        <TableRow key={payment.id}>
+                          <TableCell>{new Date(payment.paymentDate).toLocaleDateString()}</TableCell>
+                          <TableCell>
+                            <Chip
+                              label={planLabels[payment.plan]}
+                              color={payment.plan === 'premium' ? 'success' : 'primary'}
+                              size="small"
+                            />
+                          </TableCell>
+                          <TableCell align="right">{formatCurrency(payment.amount, payment.currency)}</TableCell>
+                          <TableCell>
+                            <Chip
+                              label={payment.status}
+                              color={payment.status === 'completed' ? 'success' : payment.status === 'failed' ? 'error' : 'warning'}
+                              size="small"
+                            />
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+
+            {tabValue === 2 && (
+              <Box>
+                {invoices.length === 0 ? (
+                  <Typography color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>
+                    {t('profile.noInvoices') || 'No invoices found'}
+                  </Typography>
+                ) : (
+                  <TableContainer component={Paper} variant="outlined">
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell><strong>{t('profile.invoiceId') || 'Invoice ID'}</strong></TableCell>
+                          <TableCell><strong>{t('profile.date') || 'Date'}</strong></TableCell>
+                          <TableCell align="right"><strong>{t('profile.amount') || 'Amount'}</strong></TableCell>
+                          <TableCell><strong>{t('profile.status') || 'Status'}</strong></TableCell>
+                          <TableCell align="center"><strong>{t('profile.actions') || 'Actions'}</strong></TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {invoices.map((invoice) => (
+                          <TableRow key={invoice.id}>
+                            <TableCell>{invoice.id}</TableCell>
+                            <TableCell>{new Date(invoice.issueDate).toLocaleDateString()}</TableCell>
+                            <TableCell align="right">{formatCurrency(invoice.amount, invoice.currency)}</TableCell>
+                            <TableCell>
+                              <Chip
+                                label={invoice.status}
+                                color={invoice.status === 'paid' ? 'success' : invoice.status === 'overdue' ? 'error' : 'warning'}
+                                size="small"
+                              />
+                            </TableCell>
+                            <TableCell align="center">
+                              <IconButton
+                                size="small"
+                                onClick={() => {
+                                  // Generate PDF invoice
+                                  const invoiceContent = `
+Invoice #${invoice.id}
+Date: ${new Date(invoice.issueDate).toLocaleDateString()}
+Due Date: ${new Date(invoice.dueDate).toLocaleDateString()}
+
+Items:
+${invoice.items.map((item) => `${item.description} - ${item.quantity}x ${formatCurrency(item.price, invoice.currency)}`).join('\n')}
+
+Total: ${formatCurrency(invoice.amount, invoice.currency)}
+Status: ${invoice.status}
+                                  `;
+                                  const blob = new Blob([invoiceContent], { type: 'text/plain' });
+                                  const url = URL.createObjectURL(blob);
+                                  const link = document.createElement('a');
+                                  link.href = url;
+                                  link.download = `invoice-${invoice.id}.txt`;
+                                  link.click();
+                                  URL.revokeObjectURL(url);
+                                }}
+                              >
+                                <DownloadIcon />
+                              </IconButton>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                )}
+              </Box>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       <PremiumModal
         open={premiumModalOpen}
-        onClose={() => setPremiumModalOpen(false)}
+        onClose={() => {
+          setPremiumModalOpen(false);
+          setSelectedPlanToUpgrade(null);
+        }}
+        initialPlan={selectedPlanToUpgrade || undefined}
+      />
+
+      <ConfirmDialog
+        open={cancelDialogOpen}
+        title={t('profile.cancelSubscription') || 'Cancel Subscription'}
+        message={t('profile.cancelSubscriptionConfirm') || 'Are you sure you want to cancel your subscription?'}
+        onConfirm={() => {
+          if (currentSubscription) {
+            cancelSubscription(currentSubscription.id);
+            updatePlan('basic');
+          }
+          setCancelDialogOpen(false);
+        }}
+        onCancel={() => setCancelDialogOpen(false)}
       />
     </Container>
   );

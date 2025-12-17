@@ -154,6 +154,19 @@ function DashboardPage() {
       .filter((b) => b.used > b.limit);
   }, [budgets, transactions, getCategorySpending]);
 
+  // Get store functions (not calling them in selector)
+  const getInsightsFn = useFinanceStore((state) => state.getInsights);
+  const getCategoryAnalysisFn = useFinanceStore((state) => state.getCategoryAnalysis);
+  
+  // Calculate insights and analysis using useMemo
+  const insights = useMemo(() => {
+    return getInsightsFn();
+  }, [getInsightsFn, transactions, budgets]);
+  
+  const categoryAnalysis = useMemo(() => {
+    return getCategoryAnalysisFn();
+  }, [getCategoryAnalysisFn, transactions]);
+
   const statCards = [
     {
       title: t('dashboard.balance'),
@@ -424,6 +437,60 @@ function DashboardPage() {
               </Card>
             </Grid>
           ))}
+        </Grid>
+      )}
+
+      {/* Insights Section */}
+      {insights.length > 0 && (
+        <Grid container spacing={3} sx={{ mt: 4 }}>
+          <Grid size={{ xs: 12 }}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" fontWeight={600} gutterBottom>
+                  {t('dashboard.insights') || 'Financial Insights'}
+                </Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  {insights.map((insight, idx) => (
+                    <Alert key={idx} severity={insight.type} sx={{ width: '100%' }}>
+                      <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+                        {insight.title}
+                      </Typography>
+                      <Typography variant="body2">
+                        {insight.message}
+                      </Typography>
+                    </Alert>
+                  ))}
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      )}
+
+      {/* Category Analysis */}
+      {categoryAnalysis.categories.length > 0 && (
+        <Grid container spacing={3} sx={{ mt: 4 }}>
+          <Grid size={{ xs: 12 }}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" fontWeight={600} gutterBottom>
+                  {t('dashboard.categoryAnalysis') || 'Category Analysis'}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  {t('dashboard.categoryAnalysisDesc') || 'Average spending per category: '}
+                  {formatCurrency(categoryAnalysis.average, currency)}
+                </Typography>
+                {categoryAnalysis.problemCategories.length > 0 && (
+                  <Alert severity="warning" sx={{ mt: 2 }}>
+                    <Typography variant="body2">
+                      {t('dashboard.highSpendingCategories') || 'High spending categories:'}{' '}
+                      {categoryAnalysis.problemCategories.map((c) => c.category).join(', ')}
+                    </Typography>
+                  </Alert>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
         </Grid>
       )}
     </Container>

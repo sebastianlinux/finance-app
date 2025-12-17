@@ -24,6 +24,8 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import HistoryIcon from '@mui/icons-material/History';
 import { useTranslation } from 'react-i18next';
 import { useFinanceStore } from '@/store/financeStore';
 import { Budget } from '@/types';
@@ -40,11 +42,20 @@ function BudgetsPage() {
   const { t } = useTranslation();
   const translateCategory = useTranslateCategory();
   const budgets = useFinanceStore((state) => state.budgets);
+  const budgetTemplates = useFinanceStore((state) => state.budgetTemplates);
   const addBudget = useFinanceStore((state) => state.addBudget);
   const updateBudget = useFinanceStore((state) => state.updateBudget);
   const deleteBudget = useFinanceStore((state) => state.deleteBudget);
+  const addBudgetTemplate = useFinanceStore((state) => state.addBudgetTemplate);
+  const applyBudgetTemplate = useFinanceStore((state) => state.applyBudgetTemplate);
   const getCategorySpending = useFinanceStore((state) => state.getCategorySpending);
+  const getBudgetHistory = useFinanceStore((state) => state.getBudgetHistory);
   const currency = useFinanceStore((state) => state.settings.currency);
+  
+  const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
+  const [templateName, setTemplateName] = useState('');
+  const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const [openDialog, setOpenDialog] = useState(false);
   const [editingBudgetId, setEditingBudgetId] = useState<string | null>(null);
@@ -58,6 +69,8 @@ function BudgetsPage() {
     limit: 0,
     period: 'monthly',
   });
+  
+  const [selectedPeriod, setSelectedPeriod] = useState<'monthly' | 'yearly'>('monthly');
 
   const [errors, setErrors] = useState<Partial<Record<keyof typeof formData, string>>>({});
 
@@ -79,6 +92,10 @@ function BudgetsPage() {
     }
     setErrors({});
     setOpenDialog(true);
+  };
+
+  const handleOpenNewDialog = () => {
+    handleOpenDialog();
   };
 
   const handleCloseDialog = () => {
@@ -150,17 +167,35 @@ function BudgetsPage() {
 
   return (
     <Container maxWidth="lg">
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
         <Typography variant="h4" fontWeight={700}>
           {t('budgets.title')}
         </Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={handleOpenDialog}
-        >
-          {t('budgets.addBudget')}
-        </Button>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          {budgets.length > 0 && (
+            <Button
+              variant="outlined"
+              startIcon={<ContentCopyIcon />}
+              onClick={() => setTemplateDialogOpen(true)}
+            >
+              {t('budgets.saveTemplate') || 'Save as Template'}
+            </Button>
+          )}
+          <Button
+            variant="outlined"
+            startIcon={<HistoryIcon />}
+            onClick={() => setHistoryDialogOpen(true)}
+          >
+            {t('budgets.history') || 'History'}
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleOpenNewDialog}
+          >
+            {t('budgets.addBudget')}
+          </Button>
+        </Box>
       </Box>
 
       {budgets.length === 0 ? (
@@ -301,6 +336,20 @@ function BudgetsPage() {
             </TextField>
 
             <TextField
+              select
+              label={t('budgets.period') || 'Period'}
+              value={formData.period}
+              onChange={(e) => {
+                setFormData({ ...formData, period: e.target.value as 'monthly' | 'yearly' });
+              }}
+              fullWidth
+              sx={{ mb: 2 }}
+            >
+              <MenuItem value="monthly">{t('budgets.monthly') || 'Monthly'}</MenuItem>
+              <MenuItem value="yearly">{t('budgets.yearly') || 'Yearly'}</MenuItem>
+            </TextField>
+
+            <TextField
               type="number"
               label={t('budgets.limit')}
               value={formData.limit || ''}
@@ -334,6 +383,84 @@ function BudgetsPage() {
           setBudgetToDelete(null);
         }}
       />
+
+      {/* Save Template Dialog */}
+      <Dialog open={templateDialogOpen} onClose={() => setTemplateDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>{t('budgets.saveTemplate') || 'Save as Template'}</DialogTitle>
+        <DialogContent>
+          <TextField
+            fullWidth
+            label={t('budgets.templateName') || 'Template Name'}
+            value={templateName}
+            onChange={(e) => setTemplateName(e.target.value)}
+            sx={{ mt: 2 }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => {
+            setTemplateDialogOpen(false);
+            setTemplateName('');
+          }}>
+            {t('common.cancel')}
+          </Button>
+          <Button
+            variant="contained"
+            onClick={() => {
+              if (templateName.trim()) {
+                addBudgetTemplate({
+                  name: templateName,
+                  budgets: budgets.map((b) => ({
+                    category: b.category,
+                    limit: b.limit,
+                    period: b.period,
+                  })),
+                });
+                setSnackbarMessage(t('budgets.templateSaved') || 'Template saved successfully');
+                setSnackbarOpen(true);
+                setTemplateDialogOpen(false);
+                setTemplateName('');
+              }
+            }}
+            disabled={!templateName.trim()}
+          >
+            {t('common.save')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Budget History Dialog */}
+      <Dialog open={historyDialogOpen} onClose={() => setHistoryDialogOpen(false)} maxWidth="md" fullWidth>
+        <DialogTitle>{t('budgets.history') || 'Budget History'}</DialogTitle>
+        <DialogContent>
+          {budgets.length === 0 ? (
+            <Typography color="text.secondary">{t('budgets.noHistory') || 'No budget history available'}</Typography>
+          ) : (
+            <Box>
+              {budgets.map((budget) => {
+                const history = getBudgetHistory(budget.category, budget.period);
+                return (
+                  <Box key={budget.id} sx={{ mb: 3 }}>
+                    <Typography variant="h6" gutterBottom>
+                      {translateCategory(budget.category)} - {budget.period}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {t('budgets.currentLimit') || 'Current Limit'}: {formatCurrency(budget.limit, currency)}
+                    </Typography>
+                    {history.length > 1 && (
+                      <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                        {t('budgets.historyCount') || 'Previous budgets'}: {history.length - 1}
+                      </Typography>
+                    )}
+                  </Box>
+                );
+              })}
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setHistoryDialogOpen(false)}>{t('common.close')}</Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Snackbar for feedback */}
       <Snackbar
