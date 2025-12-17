@@ -11,6 +11,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import Navbar from '@/components/Layout/Navbar';
 import Footer from '@/components/Layout/Footer';
 import PremiumModal from '@/components/PremiumModal';
+import Testimonials from '@/components/Testimonials';
 import { useState } from 'react';
 import { useAuthStore } from '@/store/authStore';
 
@@ -191,8 +192,33 @@ export default function LandingPage() {
           </Container>
         </Box>
 
+        {/* Testimonials Section */}
+        <Box id="testimonials" sx={{ py: { xs: 8, md: 12 }, bgcolor: 'background.paper' }}>
+          <Container maxWidth="lg">
+            <Typography
+              variant="h3"
+              component="h2"
+              fontWeight={700}
+              textAlign="center"
+              gutterBottom
+              sx={{ mb: 2 }}
+            >
+              {t('testimonials.title')}
+            </Typography>
+            <Typography
+              variant="h6"
+              color="text.secondary"
+              textAlign="center"
+              sx={{ mb: 6 }}
+            >
+              {t('testimonials.subtitle')}
+            </Typography>
+            <Testimonials />
+          </Container>
+        </Box>
+
         {/* Pricing Section */}
-        <Box id="pricing" sx={{ py: { xs: 8, md: 12 }, bgcolor: 'background.paper' }}>
+        <Box id="pricing" sx={{ py: { xs: 8, md: 12 }, bgcolor: 'background.default' }}>
           <Container maxWidth="lg">
             <Typography
               variant="h3"

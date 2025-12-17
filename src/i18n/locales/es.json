@@ -83,6 +83,7 @@
     "dashboard": "Panel",
     "transactions": "Transacciones",
     "budgets": "Presupuestos",
+    "blog": "Blog",
     "settings": "Configuración",
     "profile": "Mi Perfil",
     "logout": "Cerrar Sesión",
@@ -90,7 +91,8 @@
     "signup": "Registrarse",
     "features": "Características",
     "pricing": "Precios",
-    "contact": "Contacto"
+    "contact": "Contacto",
+    "about": "Acerca de"
   },
   "footer": {
     "description": "Toma el control de tus finanzas con nuestro potente y intuitivo gestor financiero.",
@@ -98,6 +100,7 @@
     "legal": "Legal",
     "privacy": "Política de Privacidad",
     "terms": "Términos de Servicio",
+    "about": "Acerca de Nosotros",
     "followUs": "Síguenos",
     "copyright": "© 2024 Gestor de Finanzas. Todos los derechos reservados."
   },
@@ -204,5 +207,65 @@
     "plan": "Plan",
     "memberSince": "Miembro Desde",
     "lastUpdated": "Última Actualización"
+  },
+  "privacy": {
+    "title": "Política de Privacidad",
+    "lastUpdated": "Última Actualización",
+    "section1Title": "Información que Recopilamos",
+    "section1Content": "Recopilamos información que nos proporcionas directamente, incluyendo tu nombre, correo electrónico y datos financieros cuando usas nuestros servicios. Todos los datos se almacenan localmente en tu dispositivo usando almacenamiento seguro del navegador.",
+    "section2Title": "Cómo Usamos Tu Información",
+    "section2Content": "Usamos la información que recopilamos para proporcionar, mantener y mejorar nuestros servicios. Tus datos financieros se procesan localmente y nunca se transmiten a servidores externos sin tu consentimiento explícito.",
+    "section3Title": "Seguridad de Datos",
+    "section3Content": "Implementamos medidas de seguridad apropiadas para proteger tu información personal. Todos los datos están encriptados y almacenados de forma segura en tu dispositivo. No tenemos acceso a tus datos financieros.",
+    "section4Title": "Tus Derechos",
+    "section4Content": "Tienes derecho a acceder, actualizar o eliminar tu información personal en cualquier momento a través de la configuración de tu cuenta. También puedes exportar tus datos o restablecer tu cuenta completamente.",
+    "section5Title": "Contáctanos",
+    "section5Content": "Si tienes alguna pregunta sobre esta Política de Privacidad, por favor contáctanos a través de nuestra página de contacto."
+  },
+  "terms": {
+    "title": "Términos de Servicio",
+    "lastUpdated": "Última Actualización",
+    "section1Title": "Aceptación de Términos",
+    "section1Content": "Al acceder y usar nuestro gestor financiero, aceptas y acuerdas estar sujeto a los términos y disposiciones de este acuerdo.",
+    "section2Title": "Licencia de Uso",
+    "section2Content": "Se otorga permiso para usar temporalmente nuestro servicio para uso personal y no comercial. Esta es la concesión de una licencia, no una transferencia de título, y bajo esta licencia no puedes modificar o copiar los materiales.",
+    "section3Title": "Cuentas de Usuario",
+    "section3Content": "Eres responsable de mantener la confidencialidad de las credenciales de tu cuenta. Acuerdas notificarnos inmediatamente de cualquier uso no autorizado de tu cuenta.",
+    "section4Title": "Limitación de Responsabilidad",
+    "section4Content": "Nuestro servicio se proporciona 'tal cual' sin garantías de ningún tipo. No seremos responsables de ningún daño que surja del uso o la incapacidad de usar nuestro servicio.",
+    "section5Title": "Cambios a los Términos",
+    "section5Content": "Nos reservamos el derecho de modificar estos términos en cualquier momento. Tu uso continuado del servicio después de cualquier cambio constituye la aceptación de los nuevos términos."
+  },
+  "about": {
+    "title": "Acerca de Nosotros",
+    "subtitle": "Empoderando a las personas para tomar el control de su futuro financiero",
+    "missionTitle": "Nuestra Misión",
+    "missionContent": "Creemos que todos merecen acceso a herramientas financieras poderosas que les ayuden a entender, gestionar y mejorar su salud financiera. Nuestra misión es hacer que la gestión de finanzas personales sea simple, accesible y efectiva para todos.",
+    "value1Title": "Transparencia",
+    "value1Desc": "Creemos en la transparencia completa. Tus datos permanecen en tu dispositivo y tienes control total sobre tu información financiera.",
+    "value2Title": "Seguridad",
+    "value2Desc": "Tu privacidad y seguridad son nuestras principales prioridades. Usamos encriptación y prácticas de seguridad estándar de la industria para proteger tus datos.",
+    "value3Title": "Soporte",
+    "value3Desc": "Estamos comprometidos a proporcionar excelente atención al cliente y mejorar continuamente nuestra plataforma basándonos en los comentarios de los usuarios."
+  },
+  "testimonials": {
+    "title": "Lo que Dicen Nuestros Usuarios",
+    "subtitle": "No solo tomes nuestra palabra - escucha a nuestros usuarios satisfechos",
+    "testimonial1Name": "Juan Pérez",
+    "testimonial1Role": "Diseñador Freelance",
+    "testimonial1Content": "Este gestor financiero ha transformado completamente cómo gestiono mi dinero. Las características de presupuesto son intuitivas y los insights son increíblemente útiles.",
+    "testimonial2Name": "María González",
+    "testimonial2Role": "Propietaria de Pequeña Empresa",
+    "testimonial2Content": "Como propietaria de negocio, llevar un registro de gastos siempre fue un desafío. Esta app hace que sea tan fácil categorizar y monitorear todo.",
+    "testimonial3Name": "Carlos Ramírez",
+    "testimonial3Role": "Recién Graduado",
+    "testimonial3Content": "Comenzar mi viaje financiero fue abrumador, pero este gestor me ayudó a entender mis hábitos de gasto y establecer metas realistas. ¡Altamente recomendado!"
+  },
+  "blog": {
+    "title": "Blog Financiero",
+    "subtitle": "Consejos e insights de expertos para ayudarte a gestionar mejor tus finanzas",
+    "backToBlog": "Volver al Blog",
+    "upgradeRequired": "Actualización Requerida",
+    "upgradeMessage": "El acceso completo a nuestros artículos del blog está disponible con planes Estándar o Premium. ¡Actualiza ahora para leer artículos completos y acceder a contenido exclusivo!"
   }
 }

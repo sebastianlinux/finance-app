@@ -1,0 +1,322 @@
+'use client';
+
+import { Container, Typography, Box, Paper, Button, Card, CardContent } from '@mui/material';
+import { useTranslation } from 'react-i18next';
+import { useRouter } from 'next/navigation';
+import Navbar from '@/components/Layout/Navbar';
+import Footer from '@/components/Layout/Footer';
+import { useAuthStore } from '@/store/authStore';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import PremiumModal from '@/components/PremiumModal';
+import { useState } from 'react';
+
+// Blog articles content
+const blogContent: Record<string, { title: string; content: string; category: string; date: string }> = {
+  '1': {
+    title: '10 Tips for Better Budget Management',
+    category: 'Budgeting',
+    date: '2024-01-15',
+    content: `Creating and maintaining a budget is one of the most important steps you can take toward financial stability. Here are 10 proven tips to help you manage your budget effectively:
+
+1. Track Every Expense: The first step to better budget management is knowing exactly where your money goes. Use our finance tracker to record every transaction, no matter how small.
+
+2. Set Realistic Goals: Your budget should reflect your actual income and expenses. Don't set unrealistic savings goals that you can't maintain.
+
+3. Use the 50/30/20 Rule: Allocate 50% of your income to needs, 30% to wants, and 20% to savings and debt repayment.
+
+4. Review Regularly: Check your budget weekly or monthly to ensure you're staying on track and make adjustments as needed.
+
+5. Build an Emergency Fund: Aim to save 3-6 months of expenses in an emergency fund before focusing on other financial goals.
+
+6. Automate Savings: Set up automatic transfers to your savings account so you save money before you have a chance to spend it.
+
+7. Cut Unnecessary Expenses: Review your spending regularly and eliminate subscriptions or services you don't use.
+
+8. Use Budget Categories: Organize your spending into categories to better understand your habits and identify areas for improvement.
+
+9. Plan for Irregular Expenses: Set aside money each month for annual expenses like insurance, taxes, or holiday shopping.
+
+10. Stay Flexible: Life changes, and so should your budget. Be willing to adjust your budget as your circumstances change.
+
+Remember, budgeting is not about restriction—it's about making informed decisions that align with your financial goals. Start implementing these tips today and watch your financial health improve!`,
+  },
+  '2': {
+    title: 'Understanding Your Financial Health',
+    category: 'Finance',
+    date: '2024-01-10',
+    content: `Your financial health is a measure of your overall financial well-being. Just like physical health, it requires regular check-ups and maintenance. Here's how to assess and improve your financial situation:
+
+Understanding Financial Health Indicators:
+
+1. Net Worth: Calculate your net worth by subtracting your liabilities from your assets. A positive and growing net worth indicates good financial health.
+
+2. Debt-to-Income Ratio: This ratio measures how much of your income goes toward debt payments. A ratio below 36% is generally considered healthy.
+
+3. Emergency Fund: Having 3-6 months of expenses saved indicates strong financial preparedness.
+
+4. Credit Score: A good credit score (above 700) shows responsible credit management and can save you money on loans and insurance.
+
+5. Savings Rate: Aim to save at least 20% of your income for long-term financial security.
+
+Improving Your Financial Health:
+
+Start by tracking all your income and expenses using our finance tracker. This will give you a clear picture of your financial situation. Then, focus on:
+
+- Reducing high-interest debt
+- Building your emergency fund
+- Increasing your savings rate
+- Investing for the future
+- Protecting your assets with insurance
+
+Regular monitoring and adjustments will help you maintain and improve your financial health over time.`,
+  },
+  '3': {
+    title: 'Investment Strategies for Beginners',
+    category: 'Investing',
+    date: '2024-01-05',
+    content: `Starting your investment journey can be overwhelming, but with the right strategies, anyone can become a successful investor. Here's a beginner's guide to investing:
+
+1. Start Early: The power of compound interest means that starting early can significantly impact your long-term wealth.
+
+2. Diversify Your Portfolio: Don't put all your eggs in one basket. Spread your investments across different asset classes and industries.
+
+3. Invest Regularly: Dollar-cost averaging—investing a fixed amount regularly—helps reduce the impact of market volatility.
+
+4. Understand Your Risk Tolerance: Assess how much risk you're comfortable taking and invest accordingly.
+
+5. Focus on Long-Term Goals: Avoid making investment decisions based on short-term market fluctuations.
+
+6. Keep Costs Low: Choose low-cost index funds and ETFs to minimize fees and maximize returns.
+
+7. Stay Educated: Continuously learn about investing, markets, and financial planning.
+
+8. Avoid Emotional Decisions: Don't let fear or greed drive your investment choices. Stick to your strategy.
+
+9. Consider Tax-Advantaged Accounts: Take advantage of retirement accounts and other tax-advantaged investment vehicles.
+
+10. Review and Rebalance: Regularly review your portfolio and rebalance to maintain your target asset allocation.
+
+Remember, investing is a long-term journey. Start small, stay consistent, and let time work in your favor.`,
+  },
+  '4': {
+    title: 'Saving Money on Daily Expenses',
+    category: 'Saving',
+    date: '2024-01-01',
+    content: `Small daily expenses can add up to significant amounts over time. Here are practical ways to reduce your daily spending without sacrificing your quality of life:
+
+1. Meal Planning: Plan your meals for the week and create a shopping list. This reduces food waste and prevents impulse purchases.
+
+2. Use Cashback Apps: Take advantage of cashback apps and credit card rewards to earn money on purchases you're already making.
+
+3. Buy Generic Brands: Generic products often offer the same quality at a fraction of the cost of name brands.
+
+4. Cancel Unused Subscriptions: Review your subscriptions monthly and cancel services you don't use regularly.
+
+5. Cook at Home: Eating out is expensive. Cooking at home can save hundreds of dollars each month.
+
+6. Use Public Transportation: If possible, use public transportation or carpool to save on gas and parking costs.
+
+7. Shop with a List: Always shop with a list to avoid impulse purchases and stick to your budget.
+
+8. Buy in Bulk: For items you use regularly, buying in bulk can save money in the long run.
+
+9. Use Coupons and Discounts: Look for coupons, discount codes, and sales before making purchases.
+
+10. Track Your Spending: Use our finance tracker to monitor your daily expenses and identify areas where you can cut back.
+
+Small changes in your daily habits can lead to significant savings over time. Start implementing these strategies today!`,
+  },
+  '5': {
+    title: 'Debt Management Best Practices',
+    category: 'Debt',
+    date: '2023-12-28',
+    content: `Managing debt effectively is crucial for financial stability. Here are best practices for handling and paying off debt:
+
+1. List All Your Debts: Create a comprehensive list of all your debts, including balances, interest rates, and minimum payments.
+
+2. Prioritize High-Interest Debt: Focus on paying off debts with the highest interest rates first to minimize total interest paid.
+
+3. Use the Debt Snowball Method: Pay off the smallest debt first, then use that payment amount to tackle the next smallest debt.
+
+4. Consider Debt Consolidation: If you have multiple high-interest debts, consolidating them into a single lower-interest loan can save money.
+
+5. Negotiate with Creditors: Contact your creditors to negotiate lower interest rates or payment plans.
+
+6. Avoid New Debt: While paying off existing debt, avoid taking on new debt whenever possible.
+
+7. Make More Than Minimum Payments: Paying more than the minimum payment will help you pay off debt faster and save on interest.
+
+8. Use Windfalls Wisely: Use tax refunds, bonuses, or other unexpected income to pay down debt.
+
+9. Track Your Progress: Monitor your debt reduction progress using our finance tracker to stay motivated.
+
+10. Seek Professional Help: If you're overwhelmed by debt, consider consulting with a credit counselor or financial advisor.
+
+Remember, getting out of debt is a marathon, not a sprint. Stay consistent and celebrate small victories along the way.`,
+  },
+  '6': {
+    title: 'Building an Emergency Fund',
+    category: 'Saving',
+    date: '2023-12-25',
+    content: `An emergency fund is a financial safety net designed to cover unexpected expenses. Here's how to build one:
+
+Why You Need an Emergency Fund:
+
+Life is full of surprises—car repairs, medical emergencies, job loss, or unexpected home repairs. An emergency fund provides financial security during these challenging times.
+
+How Much to Save:
+
+Financial experts recommend saving 3-6 months of essential expenses. Start with a smaller goal, like $1,000, and gradually build up to your target amount.
+
+Where to Keep Your Emergency Fund:
+
+Keep your emergency fund in a high-yield savings account that's easily accessible but separate from your regular checking account. This prevents you from dipping into it for non-emergencies.
+
+How to Build Your Emergency Fund:
+
+1. Set a Monthly Savings Goal: Determine how much you can realistically save each month and set up automatic transfers.
+
+2. Cut Unnecessary Expenses: Review your budget and identify areas where you can reduce spending to boost your savings.
+
+3. Use Windfalls: Direct tax refunds, bonuses, or gifts toward your emergency fund.
+
+4. Save Your Raises: When you get a raise, save the additional income rather than increasing your spending.
+
+5. Track Your Progress: Use our finance tracker to monitor your emergency fund growth and stay motivated.
+
+What Counts as an Emergency:
+
+- Medical emergencies
+- Job loss
+- Major car or home repairs
+- Unexpected travel for family emergencies
+
+What Doesn't Count:
+
+- Planned expenses (vacations, holidays)
+- Non-essential purchases
+- Investment opportunities
+
+Building an emergency fund takes time and discipline, but it's one of the most important steps you can take toward financial security. Start today, even if it's just a small amount each month.`,
+  },
+};
+
+function BlogDetailPage({ params }: { params: { id: string } }) {
+  const { t } = useTranslation();
+  const router = useRouter();
+  const user = useAuthStore((state) => state.user);
+  const [premiumModalOpen, setPremiumModalOpen] = useState(false);
+
+  const article = blogContent[params.id];
+  const canAccessFullContent = user?.plan === 'standard' || user?.plan === 'premium';
+
+  if (!article) {
+    return (
+      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        <Navbar />
+        <Box component="main" sx={{ flexGrow: 1, pt: '64px', py: 8 }}>
+          <Container maxWidth="md">
+            <Typography variant="h4">Article not found</Typography>
+          </Container>
+        </Box>
+        <Footer />
+      </Box>
+    );
+  }
+
+  const contentPreview = article.content.substring(0, 500);
+  const remainingContent = article.content.substring(500);
+
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <Navbar />
+      <Box component="main" sx={{ flexGrow: 1, pt: '64px', py: 8, bgcolor: 'background.default' }}>
+        <Container maxWidth="md">
+          <Button
+            onClick={() => router.push('/blog')}
+            sx={{ mb: 4, textTransform: 'none' }}
+          >
+            ← {t('blog.backToBlog')}
+          </Button>
+
+          <Typography variant="h3" fontWeight={700} gutterBottom>
+            {article.title}
+          </Typography>
+          <Box sx={{ display: 'flex', gap: 2, mb: 4 }}>
+            <Typography variant="body2" color="text.secondary">
+              {article.category}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              •
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {new Date(article.date).toLocaleDateString()}
+            </Typography>
+          </Box>
+
+          <Paper sx={{ p: 4 }}>
+            <Typography variant="body1" paragraph sx={{ whiteSpace: 'pre-line', lineHeight: 1.8 }}>
+              {contentPreview}
+            </Typography>
+
+            {!canAccessFullContent ? (
+              <Box>
+                <Box
+                  sx={{
+                    position: 'relative',
+                    filter: 'blur(5px)',
+                    pointerEvents: 'none',
+                    userSelect: 'none',
+                  }}
+                >
+                  <Typography variant="body1" sx={{ whiteSpace: 'pre-line', lineHeight: 1.8 }}>
+                    {remainingContent}
+                  </Typography>
+                </Box>
+                <Card
+                  sx={{
+                    mt: 4,
+                    bgcolor: 'primary.main',
+                    color: 'primary.contrastText',
+                    textAlign: 'center',
+                    p: 4,
+                  }}
+                >
+                  <Typography variant="h5" fontWeight={600} gutterBottom>
+                    {t('blog.upgradeRequired')}
+                  </Typography>
+                  <Typography variant="body1" sx={{ mb: 3, opacity: 0.9 }}>
+                    {t('blog.upgradeMessage')}
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    size="large"
+                    onClick={() => setPremiumModalOpen(true)}
+                    sx={{ textTransform: 'none' }}
+                  >
+                    {t('profile.upgradePlan')}
+                  </Button>
+                </Card>
+              </Box>
+            ) : (
+              <Typography variant="body1" sx={{ whiteSpace: 'pre-line', lineHeight: 1.8 }}>
+                {remainingContent}
+              </Typography>
+            )}
+          </Paper>
+        </Container>
+      </Box>
+      <Footer />
+      <PremiumModal open={premiumModalOpen} onClose={() => setPremiumModalOpen(false)} />
+    </Box>
+  );
+}
+
+export default function ProtectedBlogDetail({ params }: { params: { id: string } }) {
+  return (
+    <ProtectedRoute>
+      <BlogDetailPage params={params} />
+    </ProtectedRoute>
+  );
+}

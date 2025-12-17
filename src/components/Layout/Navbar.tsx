@@ -65,12 +65,14 @@ export default function Navbar() {
         { label: t('nav.dashboard'), path: '/dashboard' },
         { label: t('nav.transactions'), path: '/transactions' },
         { label: t('nav.budgets'), path: '/budgets' },
+        { label: t('nav.blog'), path: '/blog' },
         { label: t('nav.settings'), path: '/settings' },
       ]
     : [
         { label: t('nav.features'), path: '/#features' },
         { label: t('nav.pricing'), path: '/#pricing' },
         { label: t('nav.contact'), path: '/contact' },
+        { label: t('nav.about'), path: '/about' },
       ];
 
   return (

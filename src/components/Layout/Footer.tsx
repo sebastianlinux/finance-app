@@ -78,6 +78,7 @@ export default function Footer() {
                 component="button"
                 variant="body2"
                 color="text.secondary"
+                onClick={() => router.push('/privacy')}
                 sx={{ textAlign: 'left', cursor: 'pointer' }}
               >
                 {t('footer.privacy')}
@@ -86,9 +87,19 @@ export default function Footer() {
                 component="button"
                 variant="body2"
                 color="text.secondary"
+                onClick={() => router.push('/terms')}
                 sx={{ textAlign: 'left', cursor: 'pointer' }}
               >
                 {t('footer.terms')}
+              </Link>
+              <Link
+                component="button"
+                variant="body2"
+                color="text.secondary"
+                onClick={() => router.push('/about')}
+                sx={{ textAlign: 'left', cursor: 'pointer' }}
+              >
+                {t('footer.about')}
               </Link>
             </Box>
           </Grid>
