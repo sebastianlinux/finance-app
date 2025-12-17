@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Transaction, Budget, AppSettings, CustomCategory, BudgetTemplate, FinancialGoal, RecurringTransaction, Alert } from '@/types';
+import { Transaction, Budget, AppSettings, CustomCategory, BudgetTemplate, FinancialGoal, RecurringTransaction, Alert, SharedBudget } from '@/types';
 import { normalizeCategoryToKey } from '@/utils/categories';
 import { useAuthStore } from './authStore';
 
@@ -89,6 +89,7 @@ interface FinanceState {
   financialGoals: FinancialGoal[];
   recurringTransactions: RecurringTransaction[];
   alerts: Alert[];
+  sharedBudgets: SharedBudget[];
 
   // Transaction actions
   addTransaction: (transaction: Omit<Transaction, 'id'>) => void;
@@ -129,6 +130,12 @@ interface FinanceState {
   markAlertAsRead: (id: string) => void;
   deleteAlert: (id: string) => void;
   checkBudgetAlerts: () => void;
+
+  // Shared Budgets actions
+  shareBudget: (budgetId: string, permission: 'view' | 'edit', expiresInDays?: number) => SharedBudget;
+  getSharedBudget: (shareToken: string) => SharedBudget | null;
+  revokeSharedBudget: (id: string) => void;
+  getSharedBudgetsByBudget: (budgetId: string) => SharedBudget[];
   checkBalanceAlerts: () => void;
 
   // Settings actions
@@ -165,6 +172,7 @@ export const useFinanceStore = create<FinanceState>()(
       financialGoals: [],
       recurringTransactions: [],
       alerts: [],
+      sharedBudgets: [],
 
       addTransaction: (transaction) =>
         set((state) => ({
@@ -222,7 +230,64 @@ export const useFinanceStore = create<FinanceState>()(
           transactions: [],
           budgets: [],
           settings: defaultSettings,
+          customCategories: [],
+          budgetTemplates: [],
+          financialGoals: [],
+          recurringTransactions: [],
+          alerts: [],
+          sharedBudgets: [],
         }),
+
+      // Shared Budgets actions
+      shareBudget: (budgetId, permission, expiresInDays) => {
+        const user = useAuthStore.getState().user;
+        if (!user) throw new Error('User not authenticated');
+
+        const shareToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        const expiresAt = expiresInDays
+          ? new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000).toISOString()
+          : undefined;
+
+        const sharedBudget: SharedBudget = {
+          id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+          budgetId,
+          shareToken,
+          createdBy: user.id,
+          permission,
+          expiresAt,
+          createdAt: new Date().toISOString(),
+        };
+
+        set((state) => ({
+          sharedBudgets: [...state.sharedBudgets, sharedBudget],
+        }));
+
+        return sharedBudget;
+      },
+
+      getSharedBudget: (shareToken) => {
+        const state = get();
+        const shared = state.sharedBudgets.find((sb) => sb.shareToken === shareToken);
+        
+        if (!shared) return null;
+        
+        // Check if expired
+        if (shared.expiresAt && new Date(shared.expiresAt) < new Date()) {
+          return null;
+        }
+        
+        return shared;
+      },
+
+      revokeSharedBudget: (id) =>
+        set((state) => ({
+          sharedBudgets: state.sharedBudgets.filter((sb) => sb.id !== id),
+        })),
+
+      getSharedBudgetsByBudget: (budgetId) => {
+        const state = get();
+        return state.sharedBudgets.filter((sb) => sb.budgetId === budgetId);
+      },
 
       getBalance: () => {
         const state = get();
@@ -625,6 +690,7 @@ export const useFinanceStore = create<FinanceState>()(
         financialGoals: state.financialGoals,
         recurringTransactions: state.recurringTransactions,
         alerts: state.alerts,
+        sharedBudgets: state.sharedBudgets,
       }),
     }
   )

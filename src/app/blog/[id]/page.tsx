@@ -1,6 +1,19 @@
 'use client';
 
-import { Container, Typography, Box, Paper, Button, Card, CardContent, Alert } from '@mui/material';
+import { 
+  Container, 
+  Typography, 
+  Box, 
+  Paper, 
+  Button, 
+  Card, 
+  CardContent, 
+  Alert,
+  Chip,
+  Divider,
+  IconButton,
+  useTheme,
+} from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Layout/Navbar';
@@ -11,6 +24,10 @@ import PremiumModal from '@/components/PremiumModal';
 import { useState, useEffect } from 'react';
 import * as React from 'react';
 import LockIcon from '@mui/icons-material/Lock';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import CategoryIcon from '@mui/icons-material/Category';
+import { motion } from 'framer-motion';
 
 // Blog articles content
 const blogContent: Record<string, { title: string; content: string; category: string; date: string }> = {
@@ -273,113 +290,366 @@ function BlogDetailPage({ params }: { params: Promise<{ id: string }> | { id: st
     );
   }
 
+  const theme = useTheme();
   const contentPreview = article.content.substring(0, 500);
   const remainingContent = article.content.substring(500);
+
+  // Format content with better structure
+  const formatContent = (text: string) => {
+    const lines = text.split('\n');
+    const formatted: React.ReactNode[] = [];
+    
+    lines.forEach((line, index) => {
+      const trimmed = line.trim();
+      
+      if (!trimmed) {
+        formatted.push(<Box key={`spacer-${index}`} sx={{ mb: 2 }} />);
+        return;
+      }
+      
+      // Check if it's a numbered list item
+      const numberedMatch = trimmed.match(/^(\d+)\.\s+(.+)$/);
+      if (numberedMatch) {
+        formatted.push(
+          <Box key={`item-${index}`} sx={{ display: 'flex', mb: 1.5, alignItems: 'flex-start' }}>
+            <Typography
+              variant="body1"
+              sx={{
+                fontWeight: 600,
+                color: 'primary.main',
+                mr: 2,
+                minWidth: '24px',
+              }}
+            >
+              {numberedMatch[1]}.
+            </Typography>
+            <Typography variant="body1" sx={{ lineHeight: 1.8, flex: 1 }}>
+              {numberedMatch[2]}
+            </Typography>
+          </Box>
+        );
+        return;
+      }
+      
+      // Check if it's a section header (all caps or starts with specific patterns)
+      if (trimmed.match(/^[A-Z][A-Z\s:]+$/) || trimmed.match(/^(Why|How|What|Where|When|Remember|Understanding|Improving|Building|Starting)/)) {
+        formatted.push(
+          <Typography
+            key={`header-${index}`}
+            variant="h5"
+            sx={{
+              fontWeight: 700,
+              mt: 4,
+              mb: 2,
+              color: 'primary.main',
+              fontSize: { xs: '1.25rem', sm: '1.5rem' },
+            }}
+          >
+            {trimmed}
+          </Typography>
+        );
+        return;
+      }
+      
+      // Check if it's a bullet point
+      if (trimmed.startsWith('- ')) {
+        formatted.push(
+          <Box key={`bullet-${index}`} sx={{ display: 'flex', mb: 1, alignItems: 'flex-start' }}>
+            <Typography
+              variant="body1"
+              sx={{
+                color: 'primary.main',
+                mr: 2,
+                mt: 0.5,
+              }}
+            >
+              •
+            </Typography>
+            <Typography variant="body1" sx={{ lineHeight: 1.8, flex: 1 }}>
+              {trimmed.substring(2)}
+            </Typography>
+          </Box>
+        );
+        return;
+      }
+      
+      // Regular paragraph
+      formatted.push(
+        <Typography
+          key={`para-${index}`}
+          variant="body1"
+          sx={{ lineHeight: 1.8, mb: 2 }}
+        >
+          {trimmed}
+        </Typography>
+      );
+    });
+    
+    return formatted;
+  };
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Navbar />
-      <Box component="main" sx={{ flexGrow: 1, pt: '64px', py: 8, bgcolor: 'background.default' }}>
-        <Container maxWidth="md">
-          <Button
-            onClick={() => router.push('/blog')}
-            sx={{ mb: 4, textTransform: 'none' }}
-          >
-            ← {t('blog.backToBlog')}
-          </Button>
+      <Box component="main" sx={{ flexGrow: 1, pt: '64px', bgcolor: 'background.default' }}>
+        {/* Hero Section */}
+        <Box
+          sx={{
+            background: theme.palette.mode === 'dark'
+              ? 'linear-gradient(135deg, rgba(124, 58, 237, 0.15) 0%, rgba(15, 23, 42, 1) 100%)'
+              : 'linear-gradient(135deg, rgba(124, 58, 237, 0.08) 0%, rgba(255, 255, 255, 1) 100%)',
+            py: { xs: 6, md: 8 },
+            borderBottom: 1,
+            borderColor: 'divider',
+          }}
+        >
+          <Container maxWidth="md">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Button
+                startIcon={<ArrowBackIcon />}
+                onClick={() => router.push('/blog')}
+                sx={{
+                  mb: 4,
+                  textTransform: 'none',
+                  color: 'text.secondary',
+                  '&:hover': {
+                    bgcolor: 'action.hover',
+                  },
+                }}
+              >
+                {t('blog.backToBlog')}
+              </Button>
 
-          <Typography variant="h3" fontWeight={700} gutterBottom>
-            {article.title}
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 2, mb: 4 }}>
-            <Typography variant="body2" color="text.secondary">
-              {article.category}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              •
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {new Date(article.date).toLocaleDateString()}
-            </Typography>
-          </Box>
+              <Typography
+                variant="h2"
+                sx={{
+                  fontWeight: 700,
+                  mb: 3,
+                  fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
+                  lineHeight: 1.2,
+                  background: theme.palette.mode === 'dark'
+                    ? 'linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 100%)'
+                    : 'linear-gradient(135deg, #1e293b 0%, #334155 100%)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
+                {article.title}
+              </Typography>
 
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center', mb: 2 }}>
+                <Chip
+                  icon={<CategoryIcon sx={{ fontSize: '18px !important' }} />}
+                  label={article.category}
+                  color="primary"
+                  variant="outlined"
+                  sx={{
+                    fontWeight: 600,
+                    borderWidth: 2,
+                    '&:hover': {
+                      borderWidth: 2,
+                    },
+                  }}
+                />
+                <Chip
+                  icon={<CalendarTodayIcon sx={{ fontSize: '18px !important' }} />}
+                  label={new Date(article.date).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}
+                  variant="outlined"
+                  sx={{ fontWeight: 500 }}
+                />
+              </Box>
+            </motion.div>
+          </Container>
+        </Box>
+
+        <Container maxWidth="md" sx={{ py: { xs: 4, md: 6 } }}>
           {/* Alert for basic plan users */}
           {!canAccessFullContent && (
-            <Alert 
-              severity="warning" 
-              icon={<LockIcon />}
-              sx={{ mb: 3 }}
-              action={
-                <Button 
-                  color="inherit" 
-                  size="small" 
-                  onClick={() => setPremiumModalOpen(true)}
-                  sx={{ textTransform: 'none' }}
-                >
-                  {t('profile.upgradePlan')}
-                </Button>
-              }
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
             >
-              <Typography variant="body2" fontWeight={600}>
-                {t('blog.basicPlanRestriction') || 'This article is available for Standard and Premium plans only'}
-              </Typography>
-            </Alert>
-          )}
-
-          <Paper sx={{ p: 4 }}>
-            <Typography variant="body1" paragraph sx={{ whiteSpace: 'pre-line', lineHeight: 1.8 }}>
-              {contentPreview}
-            </Typography>
-
-            {!canAccessFullContent ? (
-              <Box>
-                <Box
-                  sx={{
-                    position: 'relative',
-                    filter: 'blur(5px)',
-                    pointerEvents: 'none',
-                    userSelect: 'none',
-                    opacity: 0.5,
-                  }}
-                >
-                  <Typography variant="body1" sx={{ whiteSpace: 'pre-line', lineHeight: 1.8 }}>
-                    {remainingContent}
-                  </Typography>
-                </Box>
-                <Card
-                  sx={{
-                    mt: 4,
-                    bgcolor: 'primary.main',
-                    color: 'primary.contrastText',
-                    textAlign: 'center',
-                    p: 4,
-                    boxShadow: 4,
-                  }}
-                >
-                  <LockIcon sx={{ fontSize: 48, mb: 2, opacity: 0.9 }} />
-                  <Typography variant="h5" fontWeight={600} gutterBottom>
-                    {t('blog.upgradeRequired')}
-                  </Typography>
-                  <Typography variant="body1" sx={{ mb: 3, opacity: 0.9 }}>
-                    {t('blog.upgradeMessage')}
-                  </Typography>
+              <Alert
+                severity="warning"
+                icon={<LockIcon />}
+                sx={{
+                  mb: 4,
+                  borderRadius: 2,
+                  border: 1,
+                  borderColor: 'warning.main',
+                  bgcolor: theme.palette.mode === 'dark' ? 'rgba(245, 158, 11, 0.1)' : 'rgba(245, 158, 11, 0.05)',
+                }}
+                action={
                   <Button
-                    variant="contained"
-                    color="secondary"
-                    size="large"
+                    color="inherit"
+                    size="small"
                     onClick={() => setPremiumModalOpen(true)}
-                    sx={{ textTransform: 'none', px: 4 }}
+                    sx={{ textTransform: 'none', fontWeight: 600 }}
                   >
                     {t('profile.upgradePlan')}
                   </Button>
-                </Card>
+                }
+              >
+                <Typography variant="body2" fontWeight={600}>
+                  {t('blog.basicPlanRestriction') || 'This article is available for Standard and Premium plans only'}
+                </Typography>
+              </Alert>
+            </motion.div>
+          )}
+
+          {/* Article Content */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            <Paper
+              sx={{
+                p: { xs: 3, md: 5 },
+                borderRadius: 3,
+                boxShadow: theme.palette.mode === 'dark'
+                  ? '0 8px 32px rgba(0, 0, 0, 0.3)'
+                  : '0 8px 32px rgba(0, 0, 0, 0.08)',
+                border: 1,
+                borderColor: 'divider',
+                bgcolor: 'background.paper',
+              }}
+            >
+              <Box sx={{ mb: 3 }}>
+                {formatContent(contentPreview)}
               </Box>
-            ) : (
-              <Typography variant="body1" sx={{ whiteSpace: 'pre-line', lineHeight: 1.8, mt: 2 }}>
-                {remainingContent}
-              </Typography>
-            )}
-          </Paper>
+
+              {!canAccessFullContent ? (
+                <Box>
+                  <Box
+                    sx={{
+                      position: 'relative',
+                      filter: 'blur(8px)',
+                      pointerEvents: 'none',
+                      userSelect: 'none',
+                      opacity: 0.4,
+                      mb: -4,
+                    }}
+                  >
+                    {formatContent(remainingContent)}
+                  </Box>
+                  <Card
+                    sx={{
+                      mt: 4,
+                      background: theme.palette.mode === 'dark'
+                        ? 'linear-gradient(135deg, rgba(124, 58, 237, 0.2) 0%, rgba(15, 23, 42, 1) 100%)'
+                        : 'linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(255, 255, 255, 1) 100%)',
+                      color: 'text.primary',
+                      textAlign: 'center',
+                      p: { xs: 4, md: 6 },
+                      boxShadow: 4,
+                      border: 1,
+                      borderColor: 'primary.main',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: '4px',
+                        background: 'linear-gradient(90deg, #7c3aed 0%, #f59e0b 100%)',
+                      },
+                    }}
+                  >
+                    <motion.div
+                      initial={{ scale: 0.9, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <Box
+                        sx={{
+                          width: 80,
+                          height: 80,
+                          borderRadius: '50%',
+                          bgcolor: 'primary.main',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          mx: 'auto',
+                          mb: 3,
+                          boxShadow: 3,
+                        }}
+                      >
+                        <LockIcon sx={{ fontSize: 40, color: 'primary.contrastText' }} />
+                      </Box>
+                      <Typography
+                        variant="h4"
+                        fontWeight={700}
+                        gutterBottom
+                        sx={{
+                          mb: 2,
+                          background: theme.palette.mode === 'dark'
+                            ? 'linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 100%)'
+                            : 'linear-gradient(135deg, #1e293b 0%, #334155 100%)',
+                          backgroundClip: 'text',
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                        }}
+                      >
+                        {t('blog.upgradeRequired')}
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          mb: 4,
+                          color: 'text.secondary',
+                          maxWidth: '500px',
+                          mx: 'auto',
+                          lineHeight: 1.7,
+                        }}
+                      >
+                        {t('blog.upgradeMessage')}
+                      </Typography>
+                      <Button
+                        variant="contained"
+                        size="large"
+                        onClick={() => setPremiumModalOpen(true)}
+                        sx={{
+                          textTransform: 'none',
+                          px: 4,
+                          py: 1.5,
+                          fontSize: '1.1rem',
+                          fontWeight: 600,
+                          borderRadius: 2,
+                          boxShadow: 4,
+                          background: 'linear-gradient(135deg, #7c3aed 0%, #f59e0b 100%)',
+                          '&:hover': {
+                            background: 'linear-gradient(135deg, #6d28d9 0%, #d97706 100%)',
+                            boxShadow: 6,
+                            transform: 'translateY(-2px)',
+                          },
+                          transition: 'all 0.3s ease',
+                        }}
+                      >
+                        {t('profile.upgradePlan')}
+                      </Button>
+                    </motion.div>
+                  </Card>
+                </Box>
+              ) : (
+                <Box sx={{ mt: 2 }}>
+                  {formatContent(remainingContent)}
+                </Box>
+              )}
+            </Paper>
+          </motion.div>
         </Container>
       </Box>
       <Footer />

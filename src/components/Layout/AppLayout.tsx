@@ -34,6 +34,7 @@ import ArticleIcon from '@mui/icons-material/Article';
 import LanguageIcon from '@mui/icons-material/Language';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import KeyboardIcon from '@mui/icons-material/Keyboard';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/authStore';
 import { useFinanceStore } from '@/store/financeStore';
@@ -41,7 +42,10 @@ import LanguageModal from '@/components/common/LanguageModal';
 import AlertsPanel from '@/components/common/AlertsPanel';
 import DemoModeBanner from '@/components/common/DemoModeBanner';
 import TutorialLauncher from '@/components/common/TutorialLauncher';
+import GlobalSearch from '@/components/common/GlobalSearch';
+import KeyboardShortcutsDialog from '@/components/common/KeyboardShortcutsDialog';
 import { useTutorial } from '@/hooks/useTutorial';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 
 const drawerWidth = 240;
 
@@ -54,6 +58,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [languageModalOpen, setLanguageModalOpen] = useState(false);
   const [tutorialLauncherOpen, setTutorialLauncherOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [shortcutsDialogOpen, setShortcutsDialogOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const theme = useTheme();
@@ -111,6 +117,35 @@ export default function AppLayout({ children }: AppLayoutProps) {
     router.push('/');
     handleMenuClose();
   };
+
+  // Keyboard shortcuts
+  useKeyboardShortcuts([
+    {
+      key: 'k',
+      ctrlKey: true,
+      metaKey: true,
+      shiftKey: true,
+      action: () => setSearchOpen(true),
+      description: t('search.open') || 'Open search',
+    },
+    {
+      key: '?',
+      ctrlKey: true,
+      metaKey: true,
+      action: () => setShortcutsDialogOpen(true),
+      description: t('shortcuts.open') || 'Open keyboard shortcuts',
+    },
+    {
+      key: 'Escape',
+      action: () => {
+        if (searchOpen) setSearchOpen(false);
+        if (languageModalOpen) setLanguageModalOpen(false);
+        if (tutorialLauncherOpen) setTutorialLauncherOpen(false);
+        if (shortcutsDialogOpen) setShortcutsDialogOpen(false);
+        if (anchorEl) setAnchorEl(null);
+      },
+    },
+  ]);
 
   const drawer = (
     <Box>
@@ -222,6 +257,16 @@ export default function AppLayout({ children }: AppLayoutProps) {
               sx={{ m: 0, mr: 1 }}
             />
 
+            {/* Keyboard Shortcuts */}
+            <IconButton
+              color="inherit"
+              onClick={() => setShortcutsDialogOpen(true)}
+              sx={{ fontSize: '0.9rem' }}
+              title={t('shortcuts.open') || 'Keyboard Shortcuts'}
+            >
+              <KeyboardIcon />
+            </IconButton>
+
             {/* Tutorial/Help */}
             <IconButton
               color="inherit"
@@ -279,6 +324,18 @@ export default function AppLayout({ children }: AppLayoutProps) {
       <TutorialLauncher
         open={tutorialLauncherOpen}
         onClose={() => setTutorialLauncherOpen(false)}
+      />
+      
+      {/* Global Search */}
+      <GlobalSearch
+        open={searchOpen}
+        onClose={() => setSearchOpen(false)}
+      />
+      
+      {/* Keyboard Shortcuts Dialog */}
+      <KeyboardShortcutsDialog
+        open={shortcutsDialogOpen}
+        onClose={() => setShortcutsDialogOpen(false)}
       />
       <Box
         component="nav"

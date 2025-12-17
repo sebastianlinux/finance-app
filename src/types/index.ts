@@ -143,3 +143,13 @@ export interface Alert {
   createdAt: string;
   actionUrl?: string;
 }
+
+export interface SharedBudget {
+  id: string;
+  budgetId: string;
+  shareToken: string;
+  createdBy: string;
+  permission: 'view' | 'edit';
+  expiresAt?: string;
+  createdAt: string;
+}

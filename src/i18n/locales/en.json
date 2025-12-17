@@ -613,5 +613,41 @@
         "content": "Each budget card shows your progress with a visual indicator. Green means you're on track, red means you've exceeded the limit."
       }
     }
+  },
+  "search": {
+    "open": "Open search",
+    "placeholder": "Search transactions, budgets, goals...",
+    "noResults": "No results found",
+    "startTyping": "Start typing to search...",
+    "shortcuts": "Press Enter to select, Esc to close"
+  },
+  "shortcuts": {
+    "title": "Keyboard Shortcuts",
+    "subtitle": "Speed up your workflow with these shortcuts",
+    "open": "Keyboard Shortcuts",
+    "searchPlaceholder": "Search shortcuts...",
+    "noResults": "No shortcuts found",
+    "footer": "Press Esc to close",
+    "shortcutsCount": "shortcuts",
+    "categories": {
+      "global": "Global Shortcuts",
+      "forms": "Form Shortcuts",
+      "navigation": "Navigation"
+    },
+    "search": {
+      "description": "Open global search"
+    },
+    "close": {
+      "description": "Close modals and dialogs"
+    },
+    "save": {
+      "description": "Save form (Transactions, Budgets)"
+    },
+    "cancel": {
+      "description": "Cancel/Close form"
+    },
+    "shortcuts": {
+      "description": "Open keyboard shortcuts"
+    }
   }
 }

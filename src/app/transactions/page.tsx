@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import * as React from 'react';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import {
   Container,
   Typography,
@@ -119,6 +120,26 @@ function TransactionsPage() {
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof typeof formData, string>>>({});
+
+  // Keyboard shortcuts for dialog
+  useKeyboardShortcuts([
+    {
+      key: 'Enter',
+      action: () => {
+        if (openDialog && !errors.amount && !errors.category && !errors.date) {
+          handleSave();
+        }
+      },
+    },
+    {
+      key: 'Escape',
+      action: () => {
+        if (openDialog) {
+          handleCloseDialog();
+        }
+      },
+    },
+  ], openDialog);
 
   const handleOpenDialog = (transaction?: Transaction) => {
     if (transaction) {

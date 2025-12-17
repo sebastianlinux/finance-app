@@ -613,5 +613,41 @@
         "content": "Cada tarjeta de presupuesto muestra tu progreso con un indicador visual. Verde significa que vas bien, rojo significa que has excedido el límite."
       }
     }
+  },
+  "search": {
+    "open": "Abrir búsqueda",
+    "placeholder": "Buscar transacciones, presupuestos, metas...",
+    "noResults": "No se encontraron resultados",
+    "startTyping": "Comienza a escribir para buscar...",
+    "shortcuts": "Presiona Enter para seleccionar, Esc para cerrar"
+  },
+  "shortcuts": {
+    "title": "Atajos de Teclado",
+    "subtitle": "Acelera tu flujo de trabajo con estos atajos",
+    "open": "Atajos de Teclado",
+    "searchPlaceholder": "Buscar atajos...",
+    "noResults": "No se encontraron atajos",
+    "footer": "Presiona Esc para cerrar",
+    "shortcutsCount": "atajos",
+    "categories": {
+      "global": "Atajos Globales",
+      "forms": "Atajos de Formularios",
+      "navigation": "Navegación"
+    },
+    "search": {
+      "description": "Abrir búsqueda global"
+    },
+    "close": {
+      "description": "Cerrar modales y diálogos"
+    },
+    "save": {
+      "description": "Guardar formulario (Transacciones, Presupuestos)"
+    },
+    "cancel": {
+      "description": "Cancelar/Cerrar formulario"
+    },
+    "shortcuts": {
+      "description": "Abrir atajos de teclado"
+    }
   }
 }

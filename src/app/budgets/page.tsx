@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import {
   Container,
   Typography,
@@ -20,12 +21,17 @@ import {
   Chip,
   Alert,
   Snackbar,
+  InputAdornment,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import HistoryIcon from '@mui/icons-material/History';
+import ShareIcon from '@mui/icons-material/Share';
+import LinkIcon from '@mui/icons-material/Link';
+import EmailIcon from '@mui/icons-material/Email';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useTranslation } from 'react-i18next';
 import { useFinanceStore } from '@/store/financeStore';
 import { Budget } from '@/types';
@@ -50,12 +56,20 @@ function BudgetsPage() {
   const applyBudgetTemplate = useFinanceStore((state) => state.applyBudgetTemplate);
   const getCategorySpending = useFinanceStore((state) => state.getCategorySpending);
   const getBudgetHistory = useFinanceStore((state) => state.getBudgetHistory);
+  const shareBudget = useFinanceStore((state) => state.shareBudget);
+  const getSharedBudgetsByBudget = useFinanceStore((state) => state.getSharedBudgetsByBudget);
+  const revokeSharedBudget = useFinanceStore((state) => state.revokeSharedBudget);
   const currency = useFinanceStore((state) => state.settings.currency);
   
   const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
   const [templateName, setTemplateName] = useState('');
   const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [shareBudgetId, setShareBudgetId] = useState<string | null>(null);
+  const [sharePermission, setSharePermission] = useState<'view' | 'edit'>('view');
+  const [shareLink, setShareLink] = useState<string>('');
+  const [linkCopied, setLinkCopied] = useState(false);
 
   const [openDialog, setOpenDialog] = useState(false);
   const [editingBudgetId, setEditingBudgetId] = useState<string | null>(null);
@@ -73,6 +87,26 @@ function BudgetsPage() {
   const [selectedPeriod, setSelectedPeriod] = useState<'monthly' | 'yearly'>('monthly');
 
   const [errors, setErrors] = useState<Partial<Record<keyof typeof formData, string>>>({});
+
+  // Keyboard shortcuts for dialog
+  useKeyboardShortcuts([
+    {
+      key: 'Enter',
+      action: () => {
+        if (openDialog && !errors.category && !errors.limit) {
+          handleSave();
+        }
+      },
+    },
+    {
+      key: 'Escape',
+      action: () => {
+        if (openDialog) {
+          handleCloseDialog();
+        }
+      },
+    },
+  ], openDialog);
 
   const handleOpenDialog = (budget?: Budget) => {
     if (budget) {
@@ -228,6 +262,23 @@ function BudgetsPage() {
                         />
                       </Box>
                       <Box sx={{ display: 'flex', gap: 0.5 }}>
+                        <IconButton
+                          color="primary"
+                          onClick={() => {
+                            setShareBudgetId(budget.id);
+                            setShareDialogOpen(true);
+                            const existingShares = getSharedBudgetsByBudget(budget.id);
+                            if (existingShares.length > 0) {
+                              const share = existingShares[0];
+                              const baseUrl = window.location.origin;
+                              setShareLink(`${baseUrl}/budgets/shared/${share.shareToken}`);
+                            }
+                          }}
+                          size="small"
+                          title={t('budgets.share') || 'Share Budget'}
+                        >
+                          <ShareIcon />
+                        </IconButton>
                         <IconButton
                           color="primary"
                           onClick={() => handleOpenDialog(budget)}
@@ -474,6 +525,112 @@ function BudgetsPage() {
           {snackbarMessage}
         </Alert>
       </Snackbar>
+
+      {/* Share Budget Dialog */}
+      <Dialog open={shareDialogOpen} onClose={() => {
+        setShareDialogOpen(false);
+        setShareBudgetId(null);
+        setShareLink('');
+        setLinkCopied(false);
+      }} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          {t('budgets.shareBudget') || 'Share Budget'}
+        </DialogTitle>
+        <DialogContent>
+          {!shareLink ? (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+              <TextField
+                select
+                label={t('budgets.sharePermission') || 'Permission'}
+                value={sharePermission}
+                onChange={(e) => setSharePermission(e.target.value as 'view' | 'edit')}
+                fullWidth
+                SelectProps={{ native: true }}
+              >
+                <option value="view">{t('budgets.viewOnly') || 'View Only'}</option>
+                <option value="edit">{t('budgets.canEdit') || 'Can Edit'}</option>
+              </TextField>
+              <Button
+                variant="contained"
+                startIcon={<ShareIcon />}
+                onClick={() => {
+                  if (shareBudgetId) {
+                    const shared = shareBudget(shareBudgetId, sharePermission);
+                    const baseUrl = window.location.origin;
+                    const link = `${baseUrl}/budgets/shared/${shared.shareToken}`;
+                    setShareLink(link);
+                  }
+                }}
+                fullWidth
+              >
+                {t('budgets.generateLink') || 'Generate Share Link'}
+              </Button>
+            </Box>
+          ) : (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+              <TextField
+                label={t('budgets.shareLink') || 'Share Link'}
+                value={shareLink}
+                fullWidth
+                InputProps={{
+                  readOnly: true,
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => {
+                          navigator.clipboard.writeText(shareLink);
+                          setLinkCopied(true);
+                          setTimeout(() => setLinkCopied(false), 2000);
+                        }}
+                        edge="end"
+                      >
+                        {linkCopied ? <CheckCircleIcon color="success" /> : <ContentCopyIcon />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button
+                  variant="outlined"
+                  startIcon={<EmailIcon />}
+                  onClick={() => {
+                    window.location.href = `mailto:?subject=${encodeURIComponent(t('budgets.shareBudget') || 'Shared Budget')}&body=${encodeURIComponent(shareLink)}`;
+                  }}
+                  sx={{ flex: 1 }}
+                >
+                  {t('budgets.shareEmail') || 'Email'}
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<ContentCopyIcon />}
+                  onClick={() => {
+                    navigator.clipboard.writeText(shareLink);
+                    setLinkCopied(true);
+                    setTimeout(() => setLinkCopied(false), 2000);
+                  }}
+                  sx={{ flex: 1 }}
+                >
+                  {linkCopied ? (t('budgets.copied') || 'Copied!') : (t('budgets.copy') || 'Copy')}
+                </Button>
+              </Box>
+              <Alert severity="info" sx={{ mt: 1 }}>
+                {t('budgets.shareInfo') || 'Anyone with this link can access the budget according to the selected permission.'}
+              </Alert>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => {
+            setShareDialogOpen(false);
+            setShareBudgetId(null);
+            setShareLink('');
+            setLinkCopied(false);
+          }}>
+            {t('common.close')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 }
