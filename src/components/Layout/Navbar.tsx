@@ -15,12 +15,16 @@ import {
   Divider,
   useTheme,
   useMediaQuery,
+  Switch,
+  FormControlLabel,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import LanguageIcon from '@mui/icons-material/Language';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/authStore';
 import { useFinanceStore } from '@/store/financeStore';
+import LanguageModal from '@/components/common/LanguageModal';
 
 export default function Navbar() {
   const { t, i18n } = useTranslation();
@@ -32,10 +36,12 @@ export default function Navbar() {
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
   const language = useFinanceStore((state) => state.settings.language);
+  const darkMode = useFinanceStore((state) => state.settings.darkMode);
   const updateSettings = useFinanceStore((state) => state.updateSettings);
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [languageModalOpen, setLanguageModalOpen] = useState(false);
 
   const isLanding = pathname === '/';
   const isAuthPage = pathname?.startsWith('/login') || pathname?.startsWith('/register') || pathname?.startsWith('/forgot-password');
@@ -48,10 +54,8 @@ export default function Navbar() {
     setAnchorEl(null);
   };
 
-  const handleLanguageChange = (lang: string) => {
-    updateSettings({ language: lang });
-    i18n.changeLanguage(lang);
-    handleMenuClose();
+  const handleDarkModeToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
+    updateSettings({ darkMode: event.target.checked });
   };
 
   const handleLogout = () => {
@@ -119,21 +123,35 @@ export default function Navbar() {
         )}
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          {/* Dark Mode Toggle */}
+          <FormControlLabel
+            control={
+              <Switch
+                checked={darkMode}
+                onChange={handleDarkModeToggle}
+                size="small"
+                sx={{
+                  '& .MuiSwitch-switchBase.Mui-checked': {
+                    color: 'secondary.main',
+                  },
+                  '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                    backgroundColor: 'secondary.main',
+                  },
+                }}
+              />
+            }
+            label=""
+            sx={{ m: 0, mr: 1 }}
+          />
+
           {/* Language Selector */}
           <IconButton
             color="inherit"
-            onClick={(e) => {
-              const menu = document.createElement('div');
-              menu.style.position = 'absolute';
-              menu.style.top = '56px';
-              menu.style.right = '16px';
-              // Simple language toggle
-              const newLang = language === 'en' ? 'es' : 'en';
-              handleLanguageChange(newLang);
-            }}
+            onClick={() => setLanguageModalOpen(true)}
             sx={{ fontSize: '0.9rem' }}
+            title={t('settings.language')}
           >
-            {language.toUpperCase()}
+            <LanguageIcon />
           </IconButton>
 
           {isMobile && (
@@ -183,6 +201,12 @@ export default function Navbar() {
           )}
         </Box>
       </Toolbar>
+
+      {/* Language Modal */}
+      <LanguageModal open={languageModalOpen} onClose={() => setLanguageModalOpen(false)} />
+
+      {/* Language Modal */}
+      <LanguageModal open={languageModalOpen} onClose={() => setLanguageModalOpen(false)} />
 
       {/* Mobile Menu */}
       {isMobile && mobileMenuOpen && (

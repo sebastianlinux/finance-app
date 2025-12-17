@@ -12,8 +12,10 @@ import Navbar from '@/components/Layout/Navbar';
 import Footer from '@/components/Layout/Footer';
 import PremiumModal from '@/components/PremiumModal';
 import Testimonials from '@/components/Testimonials';
+import PageTransition from '@/components/common/PageTransition';
 import { useState } from 'react';
 import { useAuthStore } from '@/store/authStore';
+import { motion } from 'framer-motion';
 
 export default function LandingPage() {
   const { t } = useTranslation();
@@ -99,18 +101,24 @@ export default function LandingPage() {
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <Navbar />
-      <Box component="main" sx={{ flexGrow: 1, pt: '64px' }}>
-        {/* Hero Section */}
-        <Box
-          sx={{
-            bgcolor: 'primary.main',
-            color: 'primary.contrastText',
-            py: { xs: 8, md: 12 },
-            textAlign: 'center',
-          }}
-        >
+    <PageTransition>
+      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        <Navbar />
+        <Box component="main" sx={{ flexGrow: 1, pt: '64px' }}>
+          {/* Hero Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <Box
+              sx={{
+                bgcolor: 'primary.main',
+                color: 'primary.contrastText',
+                py: { xs: 8, md: 12 },
+                textAlign: 'center',
+              }}
+            >
           <Container maxWidth="lg">
             <Typography
               variant="h2"
@@ -149,12 +157,18 @@ export default function LandingPage() {
               >
                 {t('landing.learnMore')}
               </Button>
-            </Box>
-          </Container>
-        </Box>
+              </Box>
+            </Container>
+          </Box>
+          </motion.div>
 
-        {/* Features Section */}
-        <Box id="features" sx={{ py: { xs: 8, md: 12 }, bgcolor: 'background.default' }}>
+          {/* Features Section */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <Box id="features" sx={{ py: { xs: 8, md: 12 }, bgcolor: 'background.default' }}>
           <Container maxWidth="lg">
             <Typography
               variant="h3"
@@ -188,12 +202,18 @@ export default function LandingPage() {
                   </Card>
                 </Grid>
               ))}
-            </Grid>
-          </Container>
-        </Box>
+              </Grid>
+            </Container>
+          </Box>
+          </motion.div>
 
-        {/* Video Section */}
-        <Box id="video" sx={{ py: { xs: 8, md: 12 }, bgcolor: 'background.paper' }}>
+          {/* Video Section */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            <Box id="video" sx={{ py: { xs: 8, md: 12 }, bgcolor: 'background.paper' }}>
           <Container maxWidth="lg">
             <Typography
               variant="h3"
@@ -241,12 +261,18 @@ export default function LandingPage() {
                   height: '100%',
                 }}
               />
-            </Box>
-          </Container>
-        </Box>
+              </Box>
+            </Container>
+          </Box>
+          </motion.div>
 
-        {/* Testimonials Section */}
-        <Box id="testimonials" sx={{ py: { xs: 8, md: 12 }, bgcolor: 'background.default' }}>
+          {/* Testimonials Section */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            <Box id="testimonials" sx={{ py: { xs: 8, md: 12 }, bgcolor: 'background.default' }}>
           <Container maxWidth="lg">
             <Typography
               variant="h3"
@@ -266,12 +292,18 @@ export default function LandingPage() {
             >
               {t('testimonials.subtitle')}
             </Typography>
-            <Testimonials />
-          </Container>
-        </Box>
+              <Testimonials />
+            </Container>
+          </Box>
+          </motion.div>
 
-        {/* Pricing Section */}
-        <Box id="pricing" sx={{ py: { xs: 8, md: 12 }, bgcolor: 'background.default' }}>
+          {/* Pricing Section */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+          >
+            <Box id="pricing" sx={{ py: { xs: 8, md: 12 }, bgcolor: 'background.default' }}>
           <Container maxWidth="lg">
             <Typography
               variant="h3"
@@ -372,12 +404,14 @@ export default function LandingPage() {
                   </Card>
                 </Grid>
               ))}
-            </Grid>
-          </Container>
+              </Grid>
+            </Container>
+          </Box>
+          </motion.div>
         </Box>
+        <Footer />
+        <PremiumModal open={premiumModalOpen} onClose={() => setPremiumModalOpen(false)} />
       </Box>
-      <Footer />
-      <PremiumModal open={premiumModalOpen} onClose={() => setPremiumModalOpen(false)} />
-    </Box>
+    </PageTransition>
   );
 }

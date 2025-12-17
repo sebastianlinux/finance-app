@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/authStore';
 import Navbar from '@/components/Layout/Navbar';
 import Footer from '@/components/Layout/Footer';
+import PageTransition from '@/components/common/PageTransition';
 
 export default function LoginPage() {
   const { t } = useTranslation();
@@ -75,22 +76,31 @@ export default function LoginPage() {
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <Navbar />
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          py: 8,
-          pt: { xs: 12, sm: 16 },
-          bgcolor: 'background.default',
-        }}
-      >
-        <Container maxWidth="sm">
-          <Card>
+    <PageTransition>
+      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        <Navbar />
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            py: 8,
+            pt: { xs: 12, sm: 16 },
+            bgcolor: 'background.default',
+          }}
+        >
+          <Container maxWidth="sm">
+            <Card
+              sx={{
+                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-4px)',
+                  boxShadow: 6,
+                },
+              }}
+            >
             <CardContent sx={{ p: 4 }}>
               <Typography variant="h4" fontWeight={700} gutterBottom textAlign="center">
                 {t('auth.loginTitle')}
@@ -180,9 +190,10 @@ export default function LoginPage() {
               </Box>
             </CardContent>
           </Card>
-        </Container>
+          </Container>
+        </Box>
+        <Footer />
       </Box>
-      <Footer />
-    </Box>
+    </PageTransition>
   );
 }

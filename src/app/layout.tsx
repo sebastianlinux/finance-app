@@ -3,6 +3,7 @@
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import { I18nextProvider } from 'react-i18next';
 import { useEffect, useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { lightTheme, darkTheme } from '@/theme/theme';
 import i18n from '@/i18n/config';
 import { useFinanceStore } from '@/store/financeStore';
