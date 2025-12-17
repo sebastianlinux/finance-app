@@ -17,6 +17,11 @@ import {
   IconButton,
   useTheme,
   useMediaQuery,
+  Switch,
+  FormControlLabel,
+  Avatar,
+  Menu,
+  MenuItem,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -26,7 +31,12 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import HomeIcon from '@mui/icons-material/Home';
 import PersonIcon from '@mui/icons-material/Person';
 import ArticleIcon from '@mui/icons-material/Article';
+import LanguageIcon from '@mui/icons-material/Language';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { useTranslation } from 'react-i18next';
+import { useAuthStore } from '@/store/authStore';
+import { useFinanceStore } from '@/store/financeStore';
+import LanguageModal from '@/components/common/LanguageModal';
 
 const drawerWidth = 240;
 
@@ -36,11 +46,17 @@ interface AppLayoutProps {
 
 export default function AppLayout({ children }: AppLayoutProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [languageModalOpen, setLanguageModalOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const { t } = useTranslation();
+  const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
+  const darkMode = useFinanceStore((state) => state.settings.darkMode);
+  const updateSettings = useFinanceStore((state) => state.updateSettings);
 
   const mainMenuItems = [
     { text: t('common.dashboard'), icon: <DashboardIcon />, path: '/dashboard' },
@@ -64,6 +80,24 @@ export default function AppLayout({ children }: AppLayoutProps) {
     if (isMobile) {
       setMobileOpen(false);
     }
+  };
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleDarkModeToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
+    updateSettings({ darkMode: event.target.checked });
+  };
+
+  const handleLogout = () => {
+    logout();
+    router.push('/');
+    handleMenuClose();
   };
 
   const drawer = (
@@ -137,20 +171,79 @@ export default function AppLayout({ children }: AppLayoutProps) {
           ml: { md: `${drawerWidth}px` },
         }}
       >
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { md: 'none' } }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" noWrap component="div">
-            {[...mainMenuItems, ...secondaryMenuItems].find((item) => item.path === pathname)?.text || t('common.appName')}
-          </Typography>
+        <Toolbar sx={{ justifyContent: 'space-between' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={handleDrawerToggle}
+              sx={{ mr: 2, display: { md: 'none' } }}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Typography variant="h6" noWrap component="div">
+              {[...mainMenuItems, ...secondaryMenuItems].find((item) => item.path === pathname)?.text || t('common.appName')}
+            </Typography>
+          </Box>
+
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {/* Dark Mode Toggle */}
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={darkMode}
+                  onChange={handleDarkModeToggle}
+                  size="small"
+                  sx={{
+                    '& .MuiSwitch-switchBase.Mui-checked': {
+                      color: 'secondary.main',
+                    },
+                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                      backgroundColor: 'secondary.main',
+                    },
+                  }}
+                />
+              }
+              label=""
+              sx={{ m: 0, mr: 1 }}
+            />
+
+            {/* Language Selector */}
+            <IconButton
+              color="inherit"
+              onClick={() => setLanguageModalOpen(true)}
+              sx={{ fontSize: '0.9rem' }}
+              title={t('settings.language')}
+            >
+              <LanguageIcon />
+            </IconButton>
+
+            {/* Profile Menu */}
+            <IconButton onClick={handleMenuOpen} color="inherit">
+              <Avatar sx={{ width: 32, height: 32, bgcolor: 'secondary.main' }}>
+                {user?.name?.charAt(0).toUpperCase() || 'U'}
+              </Avatar>
+            </IconButton>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+            >
+              <MenuItem onClick={() => { router.push('/profile'); handleMenuClose(); }}>
+                <AccountCircleIcon sx={{ mr: 1 }} />
+                {t('nav.profile')}
+              </MenuItem>
+              <Divider />
+              <MenuItem onClick={handleLogout}>{t('nav.logout')}</MenuItem>
+            </Menu>
+          </Box>
         </Toolbar>
+
+        {/* Language Modal */}
+        <LanguageModal open={languageModalOpen} onClose={() => setLanguageModalOpen(false)} />
       </AppBar>
       <Box
         component="nav"
