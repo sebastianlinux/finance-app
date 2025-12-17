@@ -27,7 +27,7 @@ import { useFinanceStore } from '@/store/financeStore';
 import LanguageModal from '@/components/common/LanguageModal';
 
 export default function Navbar() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const router = useRouter();
   const pathname = usePathname();
   const theme = useTheme();
@@ -35,7 +35,6 @@ export default function Navbar() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
-  const language = useFinanceStore((state) => state.settings.language);
   const darkMode = useFinanceStore((state) => state.settings.darkMode);
   const updateSettings = useFinanceStore((state) => state.updateSettings);
 
@@ -43,7 +42,6 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [languageModalOpen, setLanguageModalOpen] = useState(false);
 
-  const isLanding = pathname === '/';
   const isAuthPage = pathname?.startsWith('/login') || pathname?.startsWith('/register') || pathname?.startsWith('/forgot-password');
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -80,7 +78,18 @@ export default function Navbar() {
       ];
 
   return (
-    <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+    <AppBar 
+      position="fixed" 
+      elevation={darkMode ? 4 : 0}
+      sx={{ 
+        zIndex: (theme) => theme.zIndex.drawer + 1,
+        backgroundColor: darkMode ? 'primary.main' : 'white',
+        color: darkMode ? 'white' : 'text.primary',
+        borderBottom: darkMode ? 'none' : '1px solid',
+        borderColor: darkMode ? 'transparent' : 'divider',
+        boxShadow: darkMode ? undefined : '0 1px 3px rgba(0,0,0,0.08)',
+      }}
+    >
       <Toolbar sx={{ justifyContent: 'space-between', px: { xs: 2, md: 4 } }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <Typography

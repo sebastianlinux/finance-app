@@ -113,10 +113,28 @@ export default function LandingPage() {
           >
             <Box
               sx={{
-                bgcolor: 'primary.main',
-                color: 'primary.contrastText',
+                position: 'relative',
+                backgroundImage: 'url(/header.png)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                color: 'white',
                 py: { xs: 8, md: 12 },
                 textAlign: 'center',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                  zIndex: 0,
+                },
+                '& > *': {
+                  position: 'relative',
+                  zIndex: 1,
+                },
               }}
             >
           <Container maxWidth="lg">
@@ -125,13 +143,21 @@ export default function LandingPage() {
               component="h1"
               fontWeight={700}
               gutterBottom
-              sx={{ fontSize: { xs: '2rem', md: '3.5rem' } }}
+              sx={{ 
+                fontSize: { xs: '2rem', md: '3.5rem' },
+                color: 'white',
+              }}
             >
               {t('landing.heroTitle')}
             </Typography>
             <Typography
               variant="h5"
-              sx={{ mb: 4, opacity: 0.9, fontSize: { xs: '1rem', md: '1.5rem' } }}
+              sx={{ 
+                mb: 4, 
+                opacity: 0.9, 
+                fontSize: { xs: '1rem', md: '1.5rem' },
+                color: 'white',
+              }}
             >
               {t('landing.heroSubtitle')}
             </Typography>
@@ -147,13 +173,22 @@ export default function LandingPage() {
               </Button>
               <Button
                 variant="outlined"
-                color="inherit"
                 size="large"
                 onClick={() => {
                   const element = document.querySelector('#features');
                   element?.scrollIntoView({ behavior: 'smooth' });
                 }}
-                sx={{ textTransform: 'none', px: 4, py: 1.5 }}
+                sx={{ 
+                  textTransform: 'none', 
+                  px: 4, 
+                  py: 1.5,
+                  borderColor: 'white',
+                  color: 'white',
+                  '&:hover': {
+                    borderColor: 'white',
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  },
+                }}
               >
                 {t('landing.learnMore')}
               </Button>
@@ -168,7 +203,17 @@ export default function LandingPage() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <Box id="features" sx={{ py: { xs: 8, md: 12 }, bgcolor: 'background.default' }}>
+            <Box 
+              id="features" 
+              sx={{ 
+                py: { xs: 8, md: 12 }, 
+                bgcolor: 'background.default',
+                background: (theme) => 
+                  theme.palette.mode === 'light'
+                    ? 'linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%)'
+                    : 'background.default',
+              }}
+            >
           <Container maxWidth="lg">
             <Typography
               variant="h3"
@@ -176,7 +221,16 @@ export default function LandingPage() {
               fontWeight={700}
               textAlign="center"
               gutterBottom
-              sx={{ mb: 2 }}
+              sx={{ 
+                mb: 2,
+                background: (theme) => 
+                  theme.palette.mode === 'light'
+                    ? 'linear-gradient(135deg, #1976d2 0%, #9c27b0 100%)'
+                    : 'none',
+                backgroundClip: theme => theme.palette.mode === 'light' ? 'text' : 'unset',
+                WebkitBackgroundClip: theme => theme.palette.mode === 'light' ? 'text' : 'unset',
+                WebkitTextFillColor: theme => theme.palette.mode === 'light' ? 'transparent' : 'inherit',
+              }}
             >
               {t('landing.featuresTitle')}
             </Typography>
@@ -184,15 +238,49 @@ export default function LandingPage() {
               variant="h6"
               color="text.secondary"
               textAlign="center"
-              sx={{ mb: 6 }}
+              sx={{ mb: 6, maxWidth: '600px', mx: 'auto' }}
             >
               {t('landing.featuresSubtitle')}
             </Typography>
             <Grid container spacing={4}>
               {features.map((feature, index) => (
                 <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
-                  <Card sx={{ height: '100%', textAlign: 'center', p: 3 }}>
-                    <Box sx={{ color: 'primary.main', mb: 2 }}>{feature.icon}</Box>
+                  <Card 
+                    sx={{ 
+                      height: '100%', 
+                      textAlign: 'center', 
+                      p: 3,
+                      transition: 'all 0.3s ease',
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      '&:hover': {
+                        transform: 'translateY(-8px)',
+                        boxShadow: 6,
+                        borderColor: 'primary.main',
+                      },
+                    }}
+                  >
+                    <Box 
+                      sx={{ 
+                        mb: 2,
+                        display: 'inline-flex',
+                        p: 2,
+                        borderRadius: 2,
+                        bgcolor: (theme) => 
+                          theme.palette.mode === 'light' 
+                            ? 'rgba(25, 118, 210, 0.1)' 
+                            : 'rgba(144, 202, 249, 0.1)',
+                        '& svg': {
+                          color: (theme) => 
+                            theme.palette.mode === 'light' 
+                              ? theme.palette.primary.main 
+                              : theme.palette.primary.light,
+                          fontSize: 48,
+                        },
+                      }}
+                    >
+                      {feature.icon}
+                    </Box>
                     <Typography variant="h6" fontWeight={600} gutterBottom>
                       {feature.title}
                     </Typography>
@@ -213,7 +301,17 @@ export default function LandingPage() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <Box id="video" sx={{ py: { xs: 8, md: 12 }, bgcolor: 'background.paper' }}>
+            <Box 
+              id="video" 
+              sx={{ 
+                py: { xs: 8, md: 12 }, 
+                bgcolor: 'background.paper',
+                background: (theme) => 
+                  theme.palette.mode === 'light'
+                    ? 'linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%)'
+                    : 'background.paper',
+              }}
+            >
           <Container maxWidth="lg">
             <Typography
               variant="h3"
@@ -272,7 +370,17 @@ export default function LandingPage() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            <Box id="testimonials" sx={{ py: { xs: 8, md: 12 }, bgcolor: 'background.default' }}>
+            <Box 
+              id="testimonials" 
+              sx={{ 
+                py: { xs: 8, md: 12 }, 
+                bgcolor: 'background.default',
+                background: (theme) => 
+                  theme.palette.mode === 'light'
+                    ? 'linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%)'
+                    : 'background.default',
+              }}
+            >
           <Container maxWidth="lg">
             <Typography
               variant="h3"
@@ -303,7 +411,17 @@ export default function LandingPage() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.5 }}
           >
-            <Box id="pricing" sx={{ py: { xs: 8, md: 12 }, bgcolor: 'background.default' }}>
+            <Box 
+              id="pricing" 
+              sx={{ 
+                py: { xs: 8, md: 12 }, 
+                bgcolor: 'background.default',
+                background: (theme) => 
+                  theme.palette.mode === 'light'
+                    ? 'linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%)'
+                    : 'background.default',
+              }}
+            >
           <Container maxWidth="lg">
             <Typography
               variant="h3"
@@ -334,6 +452,11 @@ export default function LandingPage() {
                       position: 'relative',
                       border: plan.popular ? 2 : 1,
                       borderColor: plan.popular ? `${plan.color}.main` : 'divider',
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        transform: 'translateY(-4px)',
+                        boxShadow: plan.popular ? 8 : 4,
+                      },
                     }}
                   >
                     {plan.popular && (

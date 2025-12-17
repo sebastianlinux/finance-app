@@ -203,8 +203,8 @@ Transactions: ${yearlyReport.transactions}
                   <Card>
                     <CardContent>
                       <Typography variant="body2" color="text.secondary">{t('dashboard.totalIncome')}</Typography>
-                      <Typography variant="h5" color="success.main" fontWeight={700}>
-                        <span className="mono">{formatCurrency(monthlyReport.income, currency)}</span>
+                      <Typography variant="h5" color="success.main" fontWeight={700} className="mono">
+                        {formatCurrency(monthlyReport.income, currency)}
                       </Typography>
                     </CardContent>
                   </Card>
@@ -213,8 +213,8 @@ Transactions: ${yearlyReport.transactions}
                   <Card>
                     <CardContent>
                       <Typography variant="body2" color="text.secondary">{t('dashboard.totalExpenses')}</Typography>
-                      <Typography variant="h5" color="error.main" fontWeight={700}>
-                        <span className="mono">{formatCurrency(monthlyReport.expenses, currency)}</span>
+                      <Typography variant="h5" color="error.main" fontWeight={700} className="mono">
+                        {formatCurrency(monthlyReport.expenses, currency)}
                       </Typography>
                     </CardContent>
                   </Card>
@@ -223,7 +223,7 @@ Transactions: ${yearlyReport.transactions}
                   <Card>
                     <CardContent>
                       <Typography variant="body2" color="text.secondary">{t('dashboard.balance')}</Typography>
-                      <Typography variant="h5" fontWeight={700} sx={{ color: (monthlyReport.income - monthlyReport.expenses) >= 0 ? 'success.main' : 'error.main' }}>
+                      <Typography variant="h5" fontWeight={700} sx={{ color: (monthlyReport.income - monthlyReport.expenses) >= 0 ? 'success.main' : 'error.main' }} className="mono">
                         {formatCurrency(monthlyReport.income - monthlyReport.expenses, currency)}
                       </Typography>
                     </CardContent>
@@ -283,8 +283,8 @@ Transactions: ${yearlyReport.transactions}
                   <Card>
                     <CardContent>
                       <Typography variant="body2" color="text.secondary">{t('dashboard.totalIncome')}</Typography>
-                      <Typography variant="h5" color="success.main" fontWeight={700}>
-                        <span className="mono">{formatCurrency(yearlyReport.totalIncome, currency)}</span>
+                      <Typography variant="h5" color="success.main" fontWeight={700} className="mono">
+                        {formatCurrency(yearlyReport.totalIncome, currency)}
                       </Typography>
                     </CardContent>
                   </Card>
@@ -293,8 +293,8 @@ Transactions: ${yearlyReport.transactions}
                   <Card>
                     <CardContent>
                       <Typography variant="body2" color="text.secondary">{t('dashboard.totalExpenses')}</Typography>
-                      <Typography variant="h5" color="error.main" fontWeight={700}>
-                        <span className="mono">{formatCurrency(yearlyReport.totalExpenses, currency)}</span>
+                      <Typography variant="h5" color="error.main" fontWeight={700} className="mono">
+                        {formatCurrency(yearlyReport.totalExpenses, currency)}
                       </Typography>
                     </CardContent>
                   </Card>
@@ -303,7 +303,7 @@ Transactions: ${yearlyReport.transactions}
                   <Card>
                     <CardContent>
                       <Typography variant="body2" color="text.secondary">{t('dashboard.balance')}</Typography>
-                      <Typography variant="h5" fontWeight={700} sx={{ color: (yearlyReport.totalIncome - yearlyReport.totalExpenses) >= 0 ? 'success.main' : 'error.main' }}>
+                      <Typography variant="h5" fontWeight={700} sx={{ color: (yearlyReport.totalIncome - yearlyReport.totalExpenses) >= 0 ? 'success.main' : 'error.main' }} className="mono">
                         {formatCurrency(yearlyReport.totalIncome - yearlyReport.totalExpenses, currency)}
                       </Typography>
                     </CardContent>
