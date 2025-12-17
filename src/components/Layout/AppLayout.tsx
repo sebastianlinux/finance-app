@@ -35,6 +35,7 @@ import LanguageIcon from '@mui/icons-material/Language';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import KeyboardIcon from '@mui/icons-material/Keyboard';
+import SearchIcon from '@mui/icons-material/Search';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/authStore';
 import { useFinanceStore } from '@/store/financeStore';
@@ -117,6 +118,22 @@ export default function AppLayout({ children }: AppLayoutProps) {
     router.push('/');
     handleMenuClose();
   };
+
+  // Get user initials or default icon
+  const getUserInitials = () => {
+    if (!user?.name) return null;
+    
+    const nameParts = user.name.trim().split(/\s+/);
+    if (nameParts.length === 1) {
+      // Single name - return first letter
+      return nameParts[0].charAt(0).toUpperCase();
+    } else {
+      // Multiple names - return first letter of first and last name
+      return (nameParts[0].charAt(0) + nameParts[nameParts.length - 1].charAt(0)).toUpperCase();
+    }
+  };
+
+  const userInitials = getUserInitials();
 
   // Keyboard shortcuts
   useKeyboardShortcuts([
@@ -236,6 +253,21 @@ export default function AppLayout({ children }: AppLayoutProps) {
           </Box>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {/* Global Search Button */}
+            <IconButton
+              color="inherit"
+              onClick={() => setSearchOpen(true)}
+              sx={{ 
+                fontSize: '0.9rem',
+                '&:hover': {
+                  bgcolor: 'action.hover',
+                },
+              }}
+              title={t('search.open') || 'Open search (Ctrl+Shift+K)'}
+            >
+              <SearchIcon />
+            </IconButton>
+
             {/* Dark Mode Toggle */}
             <FormControlLabel
               control={
@@ -292,8 +324,34 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
             {/* Profile Menu */}
             <IconButton onClick={handleMenuOpen} color="inherit">
-              <Avatar sx={{ width: 32, height: 32, bgcolor: 'secondary.main' }}>
-                {user?.name?.charAt(0).toUpperCase() || 'U'}
+              <Avatar 
+                sx={{ 
+                  width: 32, 
+                  height: 32, 
+                  bgcolor: userInitials ? 'primary.main' : 'action.disabled',
+                  color: userInitials ? 'primary.contrastText' : 'text.secondary',
+                  fontSize: '0.875rem',
+                  fontWeight: 600,
+                  border: theme.palette.mode === 'light' 
+                    ? `2px solid ${userInitials ? theme.palette.primary.light : theme.palette.grey[300]}`
+                    : 'none',
+                  boxShadow: theme.palette.mode === 'light'
+                    ? userInitials
+                      ? `0 2px 8px rgba(124, 58, 237, 0.25)`
+                      : `0 2px 4px rgba(0, 0, 0, 0.1)`
+                    : 'none',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    boxShadow: theme.palette.mode === 'light'
+                      ? userInitials
+                        ? `0 4px 12px rgba(124, 58, 237, 0.35)`
+                        : `0 4px 8px rgba(0, 0, 0, 0.15)`
+                      : 'none',
+                    transform: 'scale(1.05)',
+                  },
+                }}
+              >
+                {userInitials || <AccountCircleIcon sx={{ fontSize: 20 }} />}
               </Avatar>
             </IconButton>
             <Menu

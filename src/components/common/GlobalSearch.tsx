@@ -200,11 +200,19 @@ export default function GlobalSearch({ open, onClose }: GlobalSearchProps) {
                   <SearchIcon color="action" />
                 </InputAdornment>
               ),
-              endAdornment: searchQuery && (
+              endAdornment: searchQuery ? (
                 <InputAdornment position="end">
                   <IconButton size="small" onClick={() => setSearchQuery('')}>
                     <CloseIcon fontSize="small" />
                   </IconButton>
+                </InputAdornment>
+              ) : (
+                <InputAdornment position="end">
+                  <Typography variant="caption" color="text.secondary" sx={{ mr: 1, display: { xs: 'none', sm: 'block' } }}>
+                    {typeof window !== 'undefined' && /Mac|iPhone|iPod|iPad/i.test(navigator.platform)
+                      ? '⌘⇧K'
+                      : 'Ctrl+Shift+K'}
+                  </Typography>
                 </InputAdornment>
               ),
             }}
@@ -351,6 +359,16 @@ export default function GlobalSearch({ open, onClose }: GlobalSearchProps) {
           <Box sx={{ p: 2, borderTop: 1, borderColor: 'divider', bgcolor: 'action.hover' }}>
             <Typography variant="caption" color="text.secondary">
               {t('search.shortcuts') || 'Press Enter to select, Esc to close'}
+            </Typography>
+          </Box>
+        )}
+        
+        {!searchQuery.trim() && (
+          <Box sx={{ p: 2, borderTop: 1, borderColor: 'divider', bgcolor: 'action.hover' }}>
+            <Typography variant="caption" color="text.secondary">
+              {typeof window !== 'undefined' && /Mac|iPhone|iPod|iPad/i.test(navigator.platform)
+                ? t('search.shortcutHint') || 'Press ⌘+Shift+K to open search'
+                : t('search.shortcutHint') || 'Press Ctrl+Shift+K to open search'}
             </Typography>
           </Box>
         )}

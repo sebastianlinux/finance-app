@@ -619,7 +619,8 @@
     "placeholder": "Buscar transacciones, presupuestos, metas...",
     "noResults": "No se encontraron resultados",
     "startTyping": "Comienza a escribir para buscar...",
-    "shortcuts": "Presiona Enter para seleccionar, Esc para cerrar"
+    "shortcuts": "Presiona Enter para seleccionar, Esc para cerrar",
+    "shortcutHint": "Presiona Ctrl+Shift+K para abrir búsqueda"
   },
   "shortcuts": {
     "title": "Atajos de Teclado",

@@ -56,8 +56,8 @@ export default function KeyboardShortcutsDialog({ open, onClose }: KeyboardShort
   const shortcuts: Shortcut[] = [
     {
       id: 'search',
-      keys: isMac ? ['⌘', 'K'] : ['Ctrl', 'K'],
-      macKeys: ['⌘', 'K'],
+      keys: isMac ? ['⌘', '⇧', 'K'] : ['Ctrl', 'Shift', 'K'],
+      macKeys: ['⌘', '⇧', 'K'],
       description: t('shortcuts.search.description') || 'Open global search',
       category: 'global',
       icon: <GlobalSearchIcon />,

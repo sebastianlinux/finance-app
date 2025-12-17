@@ -619,7 +619,8 @@
     "placeholder": "Search transactions, budgets, goals...",
     "noResults": "No results found",
     "startTyping": "Start typing to search...",
-    "shortcuts": "Press Enter to select, Esc to close"
+    "shortcuts": "Press Enter to select, Esc to close",
+    "shortcutHint": "Press Ctrl+Shift+K to open search"
   },
   "shortcuts": {
     "title": "Keyboard Shortcuts",
