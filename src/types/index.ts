@@ -28,3 +28,20 @@ export interface AppSettings {
   language: string;
   darkMode: boolean;
 }
+
+export type PlanType = 'basic' | 'standard' | 'premium';
+
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  plan: PlanType;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AuthState {
+  user: User | null;
+  isAuthenticated: boolean;
+  token: string | null;
+}

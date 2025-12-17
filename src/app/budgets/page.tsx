@@ -32,8 +32,10 @@ import ConfirmDialog from '@/components/common/ConfirmDialog';
 import { formatCurrency } from '@/utils/format';
 import { getAllCategoryKeys, normalizeCategoryToKey } from '@/utils/categories';
 import { useTranslateCategory } from '@/utils/translateCategory';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import AppLayout from '@/components/Layout/AppLayout';
 
-export default function BudgetsPage() {
+function BudgetsPage() {
   const { t } = useTranslation();
   const translateCategory = useTranslateCategory();
   const budgets = useFinanceStore((state) => state.budgets);
@@ -302,5 +304,15 @@ export default function BudgetsPage() {
         </Alert>
       </Snackbar>
     </Container>
+  );
+}
+
+export default function ProtectedBudgets() {
+  return (
+    <ProtectedRoute>
+      <AppLayout>
+        <BudgetsPage />
+      </AppLayout>
+    </ProtectedRoute>
   );
 }

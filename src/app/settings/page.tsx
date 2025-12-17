@@ -20,6 +20,8 @@ import { useTranslation } from 'react-i18next';
 import { useFinanceStore } from '@/store/financeStore';
 import ConfirmDialog from '@/components/common/ConfirmDialog';
 import i18n from '@/i18n/config';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import AppLayout from '@/components/Layout/AppLayout';
 
 const currencies = [
   { value: 'USD', label: 'USD ($)' },
@@ -35,7 +37,7 @@ const languages = [
   { value: 'es', label: 'Español' },
 ];
 
-export default function SettingsPage() {
+function SettingsPage() {
   const { t, i18n: i18nInstance } = useTranslation();
   const settings = useFinanceStore((state) => state.settings);
   const updateSettings = useFinanceStore((state) => state.updateSettings);
@@ -189,5 +191,15 @@ export default function SettingsPage() {
         </Alert>
       </Snackbar>
     </Container>
+  );
+}
+
+export default function ProtectedSettings() {
+  return (
+    <ProtectedRoute>
+      <AppLayout>
+        <SettingsPage />
+      </AppLayout>
+    </ProtectedRoute>
   );
 }

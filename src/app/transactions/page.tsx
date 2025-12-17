@@ -31,8 +31,10 @@ import ConfirmDialog from '@/components/common/ConfirmDialog';
 import { formatCurrency } from '@/utils/format';
 import { getCategoryKeys } from '@/utils/categories';
 import { useTranslateCategory } from '@/utils/translateCategory';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import AppLayout from '@/components/Layout/AppLayout';
 
-export default function TransactionsPage() {
+function TransactionsPage() {
   const { t } = useTranslation();
   const translateCategory = useTranslateCategory();
   const transactions = useFinanceStore((state) => state.transactions);
@@ -305,5 +307,15 @@ export default function TransactionsPage() {
         </Alert>
       </Snackbar>
     </Container>
+  );
+}
+
+export default function ProtectedTransactions() {
+  return (
+    <ProtectedRoute>
+      <AppLayout>
+        <TransactionsPage />
+      </AppLayout>
+    </ProtectedRoute>
   );
 }

@@ -40,7 +40,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const { t } = useTranslation();
 
   const menuItems = [
-    { text: t('common.dashboard'), icon: <DashboardIcon />, path: '/' },
+    { text: t('common.dashboard'), icon: <DashboardIcon />, path: '/dashboard' },
     { text: t('common.transactions'), icon: <ReceiptIcon />, path: '/transactions' },
     { text: t('common.budgets'), icon: <AccountBalanceWalletIcon />, path: '/budgets' },
     { text: t('common.settings'), icon: <SettingsIcon />, path: '/settings' },
