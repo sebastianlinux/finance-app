@@ -1,6 +1,26 @@
 'use client';
 
-import { Box, Container, Typography, Button, Grid, Card, CardContent, CardActions } from '@mui/material';
+import { 
+  Box, 
+  Container, 
+  Typography, 
+  Button, 
+  Grid, 
+  Card, 
+  CardContent, 
+  CardActions,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+  Chip,
+} from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
@@ -8,6 +28,11 @@ import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import AnalyticsIcon from '@mui/icons-material/Analytics';
 import LanguageIcon from '@mui/icons-material/Language';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CloseIcon from '@mui/icons-material/Close';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import InfoIcon from '@mui/icons-material/Info';
+import SpeedIcon from '@mui/icons-material/Speed';
+import SecurityIcon from '@mui/icons-material/Security';
 import Navbar from '@/components/Layout/Navbar';
 import Footer from '@/components/Layout/Footer';
 import PremiumModal from '@/components/PremiumModal';
@@ -22,27 +47,72 @@ export default function LandingPage() {
   const router = useRouter();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const [premiumModalOpen, setPremiumModalOpen] = useState(false);
+  const [selectedFeature, setSelectedFeature] = useState<number | null>(null);
 
   const features = [
     {
       icon: <TrendingUpIcon sx={{ fontSize: 48 }} />,
       title: t('landing.feature1Title'),
       description: t('landing.feature1Desc'),
+      details: [
+        t('landing.feature1Detail1') || 'Track all your income and expenses in one place',
+        t('landing.feature1Detail2') || 'Categorize transactions automatically',
+        t('landing.feature1Detail3') || 'View detailed financial reports and analytics',
+        t('landing.feature1Detail4') || 'Export data in multiple formats (CSV, PDF, Excel)',
+      ],
+      benefits: [
+        t('landing.feature1Benefit1') || 'Better financial visibility',
+        t('landing.feature1Benefit2') || 'Identify spending patterns',
+        t('landing.feature1Benefit3') || 'Make informed decisions',
+      ],
     },
     {
       icon: <AccountBalanceWalletIcon sx={{ fontSize: 48 }} />,
       title: t('landing.feature2Title'),
       description: t('landing.feature2Desc'),
+      details: [
+        t('landing.feature2Detail1') || 'Set monthly and yearly budgets by category',
+        t('landing.feature2Detail2') || 'Get real-time alerts when approaching limits',
+        t('landing.feature2Detail3') || 'Track budget progress with visual indicators',
+        t('landing.feature2Detail4') || 'Save and reuse budget templates',
+      ],
+      benefits: [
+        t('landing.feature2Benefit1') || 'Control your spending',
+        t('landing.feature2Benefit2') || 'Avoid overspending',
+        t('landing.feature2Benefit3') || 'Achieve financial goals faster',
+      ],
     },
     {
       icon: <AnalyticsIcon sx={{ fontSize: 48 }} />,
       title: t('landing.feature3Title'),
       description: t('landing.feature3Desc'),
+      details: [
+        t('landing.feature3Detail1') || 'Interactive charts and graphs',
+        t('landing.feature3Detail2') || 'Monthly and yearly financial reports',
+        t('landing.feature3Detail3') || 'Period comparison and trend analysis',
+        t('landing.feature3Detail4') || 'Financial projections and forecasting',
+      ],
+      benefits: [
+        t('landing.feature3Benefit1') || 'Understand your finances better',
+        t('landing.feature3Benefit2') || 'Spot trends and opportunities',
+        t('landing.feature3Benefit3') || 'Plan for the future',
+      ],
     },
     {
       icon: <LanguageIcon sx={{ fontSize: 48 }} />,
       title: t('landing.feature4Title'),
       description: t('landing.feature4Desc'),
+      details: [
+        t('landing.feature4Detail1') || 'Multi-language support (English, Spanish)',
+        t('landing.feature4Detail2') || 'Multiple currency options',
+        t('landing.feature4Detail3') || 'Dark and light themes',
+        t('landing.feature4Detail4') || 'Responsive design for all devices',
+      ],
+      benefits: [
+        t('landing.feature4Benefit1') || 'Use in your preferred language',
+        t('landing.feature4Benefit2') || 'Work with your local currency',
+        t('landing.feature4Benefit3') || 'Customize your experience',
+      ],
     },
   ];
 
@@ -284,9 +354,22 @@ export default function LandingPage() {
                     <Typography variant="h6" fontWeight={600} gutterBottom>
                       {feature.title}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 3, minHeight: '60px' }}>
                       {feature.description}
                     </Typography>
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      endIcon={<ArrowForwardIcon />}
+                      onClick={() => setSelectedFeature(index)}
+                      sx={{ 
+                        textTransform: 'none',
+                        borderRadius: 2,
+                        px: 3,
+                      }}
+                    >
+                      {t('landing.learnMore') || 'Learn More'}
+                    </Button>
                   </Card>
                 </Grid>
               ))}
@@ -507,7 +590,7 @@ export default function LandingPage() {
                       <Button
                         fullWidth
                         variant={plan.popular ? 'contained' : 'outlined'}
-                        color={plan.color as any}
+                        color={plan.color === 'primary' ? 'primary' : plan.color === 'secondary' ? 'secondary' : 'success'}
                         onClick={() => {
                           if (plan.name === t('landing.planPremium')) {
                             setPremiumModalOpen(true);
@@ -534,6 +617,153 @@ export default function LandingPage() {
         </Box>
         <Footer />
         <PremiumModal open={premiumModalOpen} onClose={() => setPremiumModalOpen(false)} />
+        
+        {/* Feature Detail Modal */}
+        <Dialog
+          open={selectedFeature !== null}
+          onClose={() => setSelectedFeature(null)}
+          maxWidth="md"
+          fullWidth
+          PaperProps={{
+            sx: {
+              borderRadius: 3,
+              background: (theme) =>
+                theme.palette.mode === 'light'
+                  ? 'linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%)'
+                  : 'background.paper',
+            },
+          }}
+        >
+          {selectedFeature !== null && (
+            <>
+              <DialogTitle
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  pb: 2,
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <Box
+                    sx={{
+                      p: 2,
+                      borderRadius: 2,
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'light'
+                          ? 'rgba(25, 118, 210, 0.1)'
+                          : 'rgba(144, 202, 249, 0.1)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        color: 'primary.main',
+                        '& svg': {
+                          fontSize: 40,
+                        },
+                      }}
+                    >
+                      {features[selectedFeature].icon}
+                    </Box>
+                  </Box>
+                  <Box>
+                    <Typography variant="h4" fontWeight={700}>
+                      {features[selectedFeature].title}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                      {features[selectedFeature].description}
+                    </Typography>
+                  </Box>
+                </Box>
+                <IconButton
+                  onClick={() => setSelectedFeature(null)}
+                  sx={{
+                    color: 'text.secondary',
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                    },
+                  }}
+                >
+                  <CloseIcon />
+                </IconButton>
+              </DialogTitle>
+              <Divider />
+              <DialogContent sx={{ pt: 3 }}>
+                <Box sx={{ mb: 4 }}>
+                  <Typography variant="h6" fontWeight={600} gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <InfoIcon color="primary" />
+                    {t('landing.featureDetails') || 'Key Features'}
+                  </Typography>
+                  <List sx={{ mt: 1 }}>
+                    {features[selectedFeature].details.map((detail, idx) => (
+                      <ListItem key={idx} sx={{ px: 0, py: 1 }}>
+                        <ListItemIcon sx={{ minWidth: 40 }}>
+                          <CheckCircleIcon color="primary" sx={{ fontSize: 24 }} />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={detail}
+                          primaryTypographyProps={{
+                            variant: 'body1',
+                            sx: { fontWeight: 500 },
+                          }}
+                        />
+                      </ListItem>
+                    ))}
+                  </List>
+                </Box>
+
+                <Box>
+                  <Typography variant="h6" fontWeight={600} gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <SpeedIcon color="primary" />
+                    {t('landing.featureBenefits') || 'Benefits'}
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, mt: 2 }}>
+                    {features[selectedFeature].benefits.map((benefit, idx) => (
+                      <Chip
+                        key={idx}
+                        label={benefit}
+                        icon={<SecurityIcon />}
+                        color="primary"
+                        variant="outlined"
+                        sx={{
+                          fontWeight: 500,
+                          py: 2.5,
+                          '& .MuiChip-icon': {
+                            color: 'primary.main',
+                          },
+                        }}
+                      />
+                    ))}
+                  </Box>
+                </Box>
+              </DialogContent>
+              <Divider />
+              <DialogActions sx={{ p: 3, pt: 2 }}>
+                <Button
+                  onClick={() => setSelectedFeature(null)}
+                  sx={{ textTransform: 'none' }}
+                >
+                  {t('common.close') || 'Close'}
+                </Button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => {
+                    setSelectedFeature(null);
+                    handleGetStarted();
+                  }}
+                  sx={{ textTransform: 'none', px: 4 }}
+                  endIcon={<ArrowForwardIcon />}
+                >
+                  {t('landing.getStarted') || 'Get Started'}
+                </Button>
+              </DialogActions>
+            </>
+          )}
+        </Dialog>
       </Box>
     </PageTransition>
   );

@@ -276,7 +276,7 @@ function SupportPage() {
 
               <TextField
                 select
-                label={t('support.priority') || 'Priority'}
+                label={t('support.priorityLabel') || 'Priority'}
                 value={formData.priority}
                 onChange={(e) => setFormData({ ...formData, priority: e.target.value as SupportTicket['priority'] })}
                 fullWidth
