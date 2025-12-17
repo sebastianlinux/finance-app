@@ -1,0 +1,82 @@
+{
+  "common": {
+    "appName": "Finance Tracker",
+    "dashboard": "Dashboard",
+    "transactions": "Transactions",
+    "budgets": "Budgets",
+    "settings": "Settings",
+    "add": "Add",
+    "delete": "Delete",
+    "edit": "Edit",
+    "save": "Save",
+    "cancel": "Cancel",
+    "reset": "Reset",
+    "confirm": "Confirm",
+    "close": "Close",
+    "loading": "Loading...",
+    "noData": "No data available"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "balance": "Balance",
+    "totalIncome": "Total Income",
+    "totalExpenses": "Total Expenses",
+    "recentTransactions": "Recent Transactions",
+    "noTransactions": "No transactions yet. Add your first transaction to get started!"
+  },
+  "transactions": {
+    "title": "Transactions",
+    "addTransaction": "Add Transaction",
+    "editTransaction": "Edit Transaction",
+    "type": "Type",
+    "income": "Income",
+    "expense": "Expense",
+    "amount": "Amount",
+    "category": "Category",
+    "date": "Date",
+    "description": "Description",
+    "noTransactions": "No transactions found. Click 'Add Transaction' to create your first one.",
+    "deleteConfirm": "Are you sure you want to delete this transaction?",
+    "required": "This field is required",
+    "invalidAmount": "Amount must be greater than 0"
+  },
+  "budgets": {
+    "title": "Budgets",
+    "addBudget": "Add Budget",
+    "editBudget": "Edit Budget",
+    "category": "Category",
+    "limit": "Limit",
+    "used": "Used",
+    "remaining": "Remaining",
+    "progress": "Progress",
+    "noBudgets": "No budgets created yet. Create a budget to track your spending!",
+    "deleteConfirm": "Are you sure you want to delete this budget?",
+    "required": "This field is required",
+    "invalidLimit": "Limit must be greater than 0",
+    "overBudget": "Over Budget",
+    "onTrack": "On Track"
+  },
+  "settings": {
+    "title": "Settings",
+    "currency": "Currency",
+    "language": "Language",
+    "darkMode": "Dark Mode",
+    "resetData": "Reset All Data",
+    "resetConfirm": "Are you sure you want to reset all data? This action cannot be undone.",
+    "resetSuccess": "All data has been reset successfully",
+    "dataReset": "Data Reset"
+  },
+  "categories": {
+    "food": "Food",
+    "transport": "Transport",
+    "shopping": "Shopping",
+    "bills": "Bills",
+    "entertainment": "Entertainment",
+    "health": "Health",
+    "education": "Education",
+    "salary": "Salary",
+    "freelance": "Freelance",
+    "investment": "Investment",
+    "other": "Other"
+  }
+}

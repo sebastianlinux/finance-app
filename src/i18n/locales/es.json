@@ -1,0 +1,82 @@
+{
+  "common": {
+    "appName": "Gestor de Finanzas",
+    "dashboard": "Panel",
+    "transactions": "Transacciones",
+    "budgets": "Presupuestos",
+    "settings": "Configuración",
+    "add": "Añadir",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "reset": "Restablecer",
+    "confirm": "Confirmar",
+    "close": "Cerrar",
+    "loading": "Cargando...",
+    "noData": "No hay datos disponibles"
+  },
+  "dashboard": {
+    "title": "Panel",
+    "balance": "Balance",
+    "totalIncome": "Ingresos Totales",
+    "totalExpenses": "Gastos Totales",
+    "recentTransactions": "Transacciones Recientes",
+    "noTransactions": "Aún no hay transacciones. ¡Añade tu primera transacción para comenzar!"
+  },
+  "transactions": {
+    "title": "Transacciones",
+    "addTransaction": "Añadir Transacción",
+    "editTransaction": "Editar Transacción",
+    "type": "Tipo",
+    "income": "Ingreso",
+    "expense": "Gasto",
+    "amount": "Cantidad",
+    "category": "Categoría",
+    "date": "Fecha",
+    "description": "Descripción",
+    "noTransactions": "No se encontraron transacciones. Haz clic en 'Añadir Transacción' para crear la primera.",
+    "deleteConfirm": "¿Estás seguro de que quieres eliminar esta transacción?",
+    "required": "Este campo es obligatorio",
+    "invalidAmount": "La cantidad debe ser mayor que 0"
+  },
+  "budgets": {
+    "title": "Presupuestos",
+    "addBudget": "Añadir Presupuesto",
+    "editBudget": "Editar Presupuesto",
+    "category": "Categoría",
+    "limit": "Límite",
+    "used": "Usado",
+    "remaining": "Restante",
+    "progress": "Progreso",
+    "noBudgets": "Aún no se han creado presupuestos. ¡Crea un presupuesto para controlar tus gastos!",
+    "deleteConfirm": "¿Estás seguro de que quieres eliminar este presupuesto?",
+    "required": "Este campo es obligatorio",
+    "invalidLimit": "El límite debe ser mayor que 0",
+    "overBudget": "Sobre Presupuesto",
+    "onTrack": "En Camino"
+  },
+  "settings": {
+    "title": "Configuración",
+    "currency": "Moneda",
+    "language": "Idioma",
+    "darkMode": "Modo Oscuro",
+    "resetData": "Restablecer Todos los Datos",
+    "resetConfirm": "¿Estás seguro de que quieres restablecer todos los datos? Esta acción no se puede deshacer.",
+    "resetSuccess": "Todos los datos se han restablecido correctamente",
+    "dataReset": "Restablecimiento de Datos"
+  },
+  "categories": {
+    "food": "Comida",
+    "transport": "Transporte",
+    "shopping": "Compras",
+    "bills": "Facturas",
+    "entertainment": "Entretenimiento",
+    "health": "Salud",
+    "education": "Educación",
+    "salary": "Salario",
+    "freelance": "Freelance",
+    "investment": "Inversión",
+    "other": "Otro"
+  }
+}
