@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Transaction, Budget, AppSettings } from '@/types';
+import { normalizeCategoryToKey } from '@/utils/categories';
 
 interface FinanceState {
   // Data
@@ -113,8 +114,12 @@ export const useFinanceStore = create<FinanceState>()(
 
       getCategorySpending: (category: string) => {
         const state = get();
+        const normalizedCategory = normalizeCategoryToKey(category);
         return state.transactions
-          .filter((t) => t.type === 'expense' && t.category === category)
+          .filter((t) => {
+            const normalizedTransactionCategory = normalizeCategoryToKey(t.category);
+            return t.type === 'expense' && normalizedTransactionCategory === normalizedCategory;
+          })
           .reduce((sum, t) => sum + t.amount, 0);
       },
     }),

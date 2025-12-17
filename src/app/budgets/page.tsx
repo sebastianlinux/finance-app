@@ -30,10 +30,12 @@ import EmptyState from '@/components/common/EmptyState';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import ConfirmDialog from '@/components/common/ConfirmDialog';
 import { formatCurrency } from '@/utils/format';
-import { getAllCategoryKeys } from '@/utils/categories';
+import { getAllCategoryKeys, normalizeCategoryToKey } from '@/utils/categories';
+import { useTranslateCategory } from '@/utils/translateCategory';
 
 export default function BudgetsPage() {
   const { t } = useTranslation();
+  const translateCategory = useTranslateCategory();
   const budgets = useFinanceStore((state) => state.budgets);
   const addBudget = useFinanceStore((state) => state.addBudget);
   const deleteBudget = useFinanceStore((state) => state.deleteBudget);
@@ -80,8 +82,9 @@ export default function BudgetsPage() {
       newErrors.category = t('budgets.required');
     }
 
-    // Check if budget already exists for this category
-    if (budgets.some((b) => b.category === formData.category)) {
+    // Check if budget already exists for this category (normalize for comparison)
+    const normalizedNewCategory = normalizeCategoryToKey(formData.category);
+    if (budgets.some((b) => normalizeCategoryToKey(b.category) === normalizedNewCategory)) {
       newErrors.category = 'Budget already exists for this category';
     }
 
@@ -116,7 +119,7 @@ export default function BudgetsPage() {
   };
 
   const categoryOptions = getAllCategoryKeys().map((key) => ({
-    value: t(`categories.${key}`),
+    value: key, // Store the key, not the translated value
     label: t(`categories.${key}`),
   }));
 
@@ -155,7 +158,7 @@ export default function BudgetsPage() {
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 2 }}>
                       <Box>
                         <Typography variant="h6" fontWeight={600} gutterBottom>
-                          {budget.category}
+                          {translateCategory(budget.category)}
                         </Typography>
                         <Chip
                           label={isOverBudget ? t('budgets.overBudget') : t('budgets.onTrack')}
@@ -241,7 +244,10 @@ export default function BudgetsPage() {
               helperText={errors.category}
             >
               {categoryOptions
-                .filter((option) => !budgets.some((b) => b.category === option.value))
+                .filter((option) => {
+                  const normalizedOptionKey = normalizeCategoryToKey(option.value);
+                  return !budgets.some((b) => normalizeCategoryToKey(b.category) === normalizedOptionKey);
+                })
                 .map((option) => (
                   <MenuItem key={option.value} value={option.value}>
                     {option.label}

@@ -30,9 +30,11 @@ import ReceiptIcon from '@mui/icons-material/Receipt';
 import ConfirmDialog from '@/components/common/ConfirmDialog';
 import { formatCurrency } from '@/utils/format';
 import { getCategoryKeys } from '@/utils/categories';
+import { useTranslateCategory } from '@/utils/translateCategory';
 
 export default function TransactionsPage() {
   const { t } = useTranslation();
+  const translateCategory = useTranslateCategory();
   const transactions = useFinanceStore((state) => state.transactions);
   const addTransaction = useFinanceStore((state) => state.addTransaction);
   const deleteTransaction = useFinanceStore((state) => state.deleteTransaction);
@@ -121,7 +123,7 @@ export default function TransactionsPage() {
   );
 
   const categoryOptions = getCategoryKeys(formData.type).map((key) => ({
-    value: t(`categories.${key}`),
+    value: key, // Store the key, not the translated value
     label: t(`categories.${key}`),
   }));
 
@@ -160,11 +162,11 @@ export default function TransactionsPage() {
                           size="small"
                         />
                         <Typography variant="subtitle1" fontWeight={600}>
-                          {transaction.description || transaction.category}
+                          {transaction.description || translateCategory(transaction.category)}
                         </Typography>
                       </Box>
                       <Typography variant="body2" color="text.secondary">
-                        {transaction.category} • {new Date(transaction.date).toLocaleDateString()}
+                        {translateCategory(transaction.category)} • {new Date(transaction.date).toLocaleDateString()}
                       </Typography>
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>

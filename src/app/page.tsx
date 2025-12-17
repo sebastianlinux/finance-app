@@ -9,9 +9,11 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import EmptyState from '@/components/common/EmptyState';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import { formatCurrency } from '@/utils/format';
+import { useTranslateCategory } from '@/utils/translateCategory';
 
 export default function DashboardPage() {
   const { t } = useTranslation();
+  const translateCategory = useTranslateCategory();
   const balance = useFinanceStore((state) => state.getBalance());
   const totalIncome = useFinanceStore((state) => state.getTotalIncome());
   const totalExpenses = useFinanceStore((state) => state.getTotalExpenses());
@@ -88,10 +90,10 @@ export default function DashboardPage() {
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Box>
                       <Typography variant="subtitle1" fontWeight={600}>
-                        {transaction.description || transaction.category}
+                        {transaction.description || translateCategory(transaction.category)}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        {transaction.category} • {new Date(transaction.date).toLocaleDateString()}
+                        {translateCategory(transaction.category)} • {new Date(transaction.date).toLocaleDateString()}
                       </Typography>
                     </Box>
                     <Typography
