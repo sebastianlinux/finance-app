@@ -751,7 +751,7 @@ function TransactionsPage() {
                             }}
                           >
                             {transaction.type === 'income' ? '+' : '-'}
-                            {formatCurrency(transaction.amount, currency)}
+                            <span className="mono">{formatCurrency(transaction.amount, currency)}</span>
                           </Typography>
                         </Box>
                       </CardContent>
@@ -800,7 +800,7 @@ function TransactionsPage() {
                             }}
                           >
                             {transaction.type === 'income' ? '+' : '-'}
-                            {formatCurrency(transaction.amount, currency)}
+                            <span className="mono">{formatCurrency(transaction.amount, currency)}</span>
                           </Typography>
                           {!compactMode && (
                             <>
@@ -889,7 +889,7 @@ function TransactionsPage() {
                         }}
                       >
                         {transaction.type === 'income' ? '+' : '-'}
-                        {formatCurrency(transaction.amount, currency)}
+                        <span className="mono">{formatCurrency(transaction.amount, currency)}</span>
                       </TableCell>
                       {!compactMode && (
                         <TableCell align="center">
@@ -946,7 +946,7 @@ function TransactionsPage() {
                           }}
                         >
                           {transaction.type === 'income' ? '+' : '-'}
-                          {formatCurrency(transaction.amount, currency)}
+                          <span className="mono">{formatCurrency(transaction.amount, currency)}</span>
                         </Typography>
                       </Box>
                     </Card>
@@ -1163,7 +1163,7 @@ function TransactionsPage() {
                         <TableCell>{row.date}</TableCell>
                         <TableCell>{row.type}</TableCell>
                         <TableCell>{row.category}</TableCell>
-                        <TableCell align="right">{formatCurrency(row.amount, currency)}</TableCell>
+                        <TableCell align="right" className="mono">{formatCurrency(row.amount, currency)}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

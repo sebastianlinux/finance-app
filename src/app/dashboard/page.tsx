@@ -240,7 +240,12 @@ function DashboardPage() {
                     <Typography color="text.secondary" gutterBottom variant="body2">
                       {card.title}
                     </Typography>
-                    <Typography variant="h5" fontWeight={700} sx={{ color: card.color }}>
+                    <Typography 
+                      variant="h5" 
+                      fontWeight={700} 
+                      sx={{ color: card.color }}
+                      className="mono"
+                    >
                       {formatCurrency(card.value, currency)}
                     </Typography>
                   </Box>
@@ -362,7 +367,7 @@ function DashboardPage() {
                     {t('dashboard.avgMonthlyIncome') || 'Avg Monthly Income'}
                   </Typography>
                   <Typography variant="h6" fontWeight={700} color="success.main">
-                    {formatCurrency(stats.avgMonthlyIncome, currency)}
+                    <span className="mono">{formatCurrency(stats.avgMonthlyIncome, currency)}</span>
                   </Typography>
                 </CardContent>
               </Card>
@@ -374,7 +379,7 @@ function DashboardPage() {
                     {t('dashboard.avgMonthlyExpense') || 'Avg Monthly Expense'}
                   </Typography>
                   <Typography variant="h6" fontWeight={700} color="error.main">
-                    {formatCurrency(stats.avgMonthlyExpense, currency)}
+                    <span className="mono">{formatCurrency(stats.avgMonthlyExpense, currency)}</span>
                   </Typography>
                 </CardContent>
               </Card>
@@ -439,7 +444,7 @@ function DashboardPage() {
                       }}
                     >
                       {transaction.type === 'income' ? '+' : '-'}
-                      {formatCurrency(transaction.amount, currency)}
+                      <span className="mono">{formatCurrency(transaction.amount, currency)}</span>
                     </Typography>
                   </Box>
                 </CardContent>
@@ -487,7 +492,7 @@ function DashboardPage() {
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                   {t('dashboard.categoryAnalysisDesc') || 'Average spending per category: '}
-                  {formatCurrency(categoryAnalysis.average, currency)}
+                  <span className="mono">{formatCurrency(categoryAnalysis.average, currency)}</span>
                 </Typography>
                 {categoryAnalysis.problemCategories.length > 0 && (
                   <Alert severity="warning" sx={{ mt: 2 }}>

@@ -204,7 +204,7 @@ Transactions: ${yearlyReport.transactions}
                     <CardContent>
                       <Typography variant="body2" color="text.secondary">{t('dashboard.totalIncome')}</Typography>
                       <Typography variant="h5" color="success.main" fontWeight={700}>
-                        {formatCurrency(monthlyReport.income, currency)}
+                        <span className="mono">{formatCurrency(monthlyReport.income, currency)}</span>
                       </Typography>
                     </CardContent>
                   </Card>
@@ -214,7 +214,7 @@ Transactions: ${yearlyReport.transactions}
                     <CardContent>
                       <Typography variant="body2" color="text.secondary">{t('dashboard.totalExpenses')}</Typography>
                       <Typography variant="h5" color="error.main" fontWeight={700}>
-                        {formatCurrency(monthlyReport.expenses, currency)}
+                        <span className="mono">{formatCurrency(monthlyReport.expenses, currency)}</span>
                       </Typography>
                     </CardContent>
                   </Card>
@@ -284,7 +284,7 @@ Transactions: ${yearlyReport.transactions}
                     <CardContent>
                       <Typography variant="body2" color="text.secondary">{t('dashboard.totalIncome')}</Typography>
                       <Typography variant="h5" color="success.main" fontWeight={700}>
-                        {formatCurrency(yearlyReport.totalIncome, currency)}
+                        <span className="mono">{formatCurrency(yearlyReport.totalIncome, currency)}</span>
                       </Typography>
                     </CardContent>
                   </Card>
@@ -294,7 +294,7 @@ Transactions: ${yearlyReport.transactions}
                     <CardContent>
                       <Typography variant="body2" color="text.secondary">{t('dashboard.totalExpenses')}</Typography>
                       <Typography variant="h5" color="error.main" fontWeight={700}>
-                        {formatCurrency(yearlyReport.totalExpenses, currency)}
+                        <span className="mono">{formatCurrency(yearlyReport.totalExpenses, currency)}</span>
                       </Typography>
                     </CardContent>
                   </Card>
@@ -390,18 +390,18 @@ Transactions: ${yearlyReport.transactions}
                 <TableBody>
                   <TableRow>
                     <TableCell>{t('dashboard.totalIncome')}</TableCell>
-                    <TableCell align="right">{formatCurrency(comparison.period1.income, currency)}</TableCell>
-                    <TableCell align="right">{formatCurrency(comparison.period2.income, currency)}</TableCell>
+                    <TableCell align="right" className="mono">{formatCurrency(comparison.period1.income, currency)}</TableCell>
+                    <TableCell align="right" className="mono">{formatCurrency(comparison.period2.income, currency)}</TableCell>
                     <TableCell align="right" sx={{ color: comparison.incomeChange >= 0 ? 'success.main' : 'error.main' }}>
-                      {comparison.incomeChange >= 0 ? '+' : ''}{formatCurrency(comparison.incomeChange, currency)} ({comparison.incomeChangePercent.toFixed(1)}%)
+                      {comparison.incomeChange >= 0 ? '+' : ''}<span className="mono">{formatCurrency(comparison.incomeChange, currency)}</span> ({comparison.incomeChangePercent.toFixed(1)}%)
                     </TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell>{t('dashboard.totalExpenses')}</TableCell>
-                    <TableCell align="right">{formatCurrency(comparison.period1.expenses, currency)}</TableCell>
-                    <TableCell align="right">{formatCurrency(comparison.period2.expenses, currency)}</TableCell>
+                    <TableCell align="right" className="mono">{formatCurrency(comparison.period1.expenses, currency)}</TableCell>
+                    <TableCell align="right" className="mono">{formatCurrency(comparison.period2.expenses, currency)}</TableCell>
                     <TableCell align="right" sx={{ color: comparison.expenseChange <= 0 ? 'success.main' : 'error.main' }}>
-                      {comparison.expenseChange >= 0 ? '+' : ''}{formatCurrency(comparison.expenseChange, currency)} ({comparison.expenseChangePercent.toFixed(1)}%)
+                      {comparison.expenseChange >= 0 ? '+' : ''}<span className="mono">{formatCurrency(comparison.expenseChange, currency)}</span> ({comparison.expenseChangePercent.toFixed(1)}%)
                     </TableCell>
                   </TableRow>
                 </TableBody>

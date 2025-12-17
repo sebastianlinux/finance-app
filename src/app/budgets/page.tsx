@@ -251,7 +251,7 @@ function BudgetsPage() {
                           {t('budgets.limit')}
                         </Typography>
                         <Typography variant="body2" fontWeight={600}>
-                          {formatCurrency(budget.limit, currency)}
+                          <span className="mono">{formatCurrency(budget.limit, currency)}</span>
                         </Typography>
                       </Box>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
@@ -275,7 +275,7 @@ function BudgetsPage() {
                           fontWeight={600}
                           sx={{ color: remaining < 0 ? 'error.main' : 'success.main' }}
                         >
-                          {formatCurrency(remaining, currency)}
+                          <span className="mono">{formatCurrency(remaining, currency)}</span>
                         </Typography>
                       </Box>
                       <LinearProgress

@@ -249,7 +249,7 @@ function RecurringPage() {
                       }}
                     >
                       {transaction.type === 'income' ? '+' : '-'}
-                      {formatCurrency(transaction.amount, currency)}
+                      <span className="mono">{formatCurrency(transaction.amount, currency)}</span>
                     </Typography>
                     <FormControlLabel
                       control={

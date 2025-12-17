@@ -340,7 +340,7 @@ function ProfilePage() {
                               size="small"
                             />
                           </TableCell>
-                          <TableCell align="right">{formatCurrency(payment.amount, payment.currency)}</TableCell>
+                          <TableCell align="right" className="mono">{formatCurrency(payment.amount, payment.currency)}</TableCell>
                           <TableCell>
                             <Chip
                               label={payment.status}
@@ -379,7 +379,7 @@ function ProfilePage() {
                           <TableRow key={invoice.id}>
                             <TableCell>{invoice.id}</TableCell>
                             <TableCell>{new Date(invoice.issueDate).toLocaleDateString()}</TableCell>
-                            <TableCell align="right">{formatCurrency(invoice.amount, invoice.currency)}</TableCell>
+                            <TableCell align="right" className="mono">{formatCurrency(invoice.amount, invoice.currency)}</TableCell>
                             <TableCell>
                               <Chip
                                 label={invoice.status}

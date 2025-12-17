@@ -218,7 +218,7 @@ function GoalsPage() {
                           {t('goals.progress') || 'Progress'}
                         </Typography>
                         <Typography variant="body2" fontWeight={600}>
-                          {formatCurrency(goal.currentAmount, currency)} / {formatCurrency(goal.targetAmount, currency)}
+                          <span className="mono">{formatCurrency(goal.currentAmount, currency)}</span> / <span className="mono">{formatCurrency(goal.targetAmount, currency)}</span>
                         </Typography>
                       </Box>
                       <LinearProgress
