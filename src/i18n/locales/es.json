@@ -137,7 +137,9 @@
     "planFeature9": "Acceso API",
     "currentPlan": "Plan Actual",
     "upgrade": "Actualizar",
-    "selectPlan": "Seleccionar Plan"
+    "selectPlan": "Seleccionar Plan",
+    "videoTitle": "Véalo En Acción",
+    "videoSubtitle": "Mira lo fácil que es gestionar tus finanzas con nuestro potente gestor"
   },
   "auth": {
     "loginTitle": "Bienvenido de Nuevo",

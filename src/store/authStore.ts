@@ -18,6 +18,36 @@ interface AuthState {
 // Simple in-memory user database (for demo - in production this would be a backend)
 const usersDb: Map<string, { email: string; password: string; name: string; plan: PlanType }> = new Map();
 
+// Initialize demo users
+const initializeDemoUsers = () => {
+  // Only initialize if the Map is empty (first load)
+  if (usersDb.size === 0) {
+    usersDb.set('demo@example.com', {
+      email: 'demo@example.com',
+      password: 'demo123',
+      name: 'Demo User',
+      plan: 'basic',
+    });
+    usersDb.set('premium@example.com', {
+      email: 'premium@example.com',
+      password: 'premium123',
+      name: 'Premium User',
+      plan: 'premium',
+    });
+    usersDb.set('standard@example.com', {
+      email: 'standard@example.com',
+      password: 'standard123',
+      name: 'Standard User',
+      plan: 'standard',
+    });
+  }
+};
+
+// Initialize on module load
+if (typeof window !== 'undefined') {
+  initializeDemoUsers();
+}
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({

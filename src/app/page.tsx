@@ -192,8 +192,61 @@ export default function LandingPage() {
           </Container>
         </Box>
 
+        {/* Video Section */}
+        <Box id="video" sx={{ py: { xs: 8, md: 12 }, bgcolor: 'background.paper' }}>
+          <Container maxWidth="lg">
+            <Typography
+              variant="h3"
+              component="h2"
+              fontWeight={700}
+              textAlign="center"
+              gutterBottom
+              sx={{ mb: 2 }}
+            >
+              {t('landing.videoTitle')}
+            </Typography>
+            <Typography
+              variant="h6"
+              color="text.secondary"
+              textAlign="center"
+              sx={{ mb: 6, maxWidth: '700px', mx: 'auto' }}
+            >
+              {t('landing.videoSubtitle')}
+            </Typography>
+            <Box
+              sx={{
+                position: 'relative',
+                width: '100%',
+                maxWidth: '900px',
+                mx: 'auto',
+                borderRadius: 3,
+                overflow: 'hidden',
+                boxShadow: 6,
+                aspectRatio: '16/9',
+              }}
+            >
+              <iframe
+                width="100%"
+                height="100%"
+                src="https://www.youtube.com/embed/mQ1UWPOVCxQ"
+                title="Finance Tracker Demo"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                }}
+              />
+            </Box>
+          </Container>
+        </Box>
+
         {/* Testimonials Section */}
-        <Box id="testimonials" sx={{ py: { xs: 8, md: 12 }, bgcolor: 'background.paper' }}>
+        <Box id="testimonials" sx={{ py: { xs: 8, md: 12 }, bgcolor: 'background.default' }}>
           <Container maxWidth="lg">
             <Typography
               variant="h3"

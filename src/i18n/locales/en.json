@@ -137,7 +137,9 @@
     "planFeature9": "API access",
     "currentPlan": "Current Plan",
     "upgrade": "Upgrade",
-    "selectPlan": "Select Plan"
+    "selectPlan": "Select Plan",
+    "videoTitle": "See It In Action",
+    "videoSubtitle": "Watch how easy it is to manage your finances with our powerful tracker"
   },
   "auth": {
     "loginTitle": "Welcome Back",
