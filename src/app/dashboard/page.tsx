@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useEffect } from 'react';
+import { useMemo } from 'react';
 import { Container, Typography, Grid, Card, CardContent, Box, Alert, IconButton } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useFinanceStore } from '@/store/financeStore';
@@ -171,17 +171,10 @@ function DashboardPage() {
   }, [getCategoryAnalysisFn, transactions]);
 
   // Tutorial
-  const { tutorialOpen, setTutorialOpen, markTutorialCompleted, startTutorial } = useTutorial();
+  const { tutorialOpen, setTutorialOpen, markTutorialCompleted } = useTutorial();
   const dashboardSteps = getDashboardTutorialSteps((key: string) => t(key) || key);
-  
-  // Auto-start tutorial on first visit (optional)
-  useEffect(() => {
-    const hasSeenTutorial = localStorage.getItem('tutorial_completed') === 'true';
-    if (!hasSeenTutorial && transactions.length === 0) {
-      // Opcional: auto-start si no hay datos
-      // startTutorial();
-    }
-  }, [transactions.length, startTutorial]);
+  // Use tutorialOpen as part of key to force remount when it opens (resets to step 0)
+  // The TutorialTour component already handles reset internally via useEffect
 
   const statCards = [
     {
@@ -512,13 +505,16 @@ function DashboardPage() {
 
       {/* Tutorial Tour */}
       <TutorialTour
+        key={`tutorial-${tutorialOpen}`}
         steps={dashboardSteps}
         open={tutorialOpen}
         onClose={() => {
           setTutorialOpen(false);
           markTutorialCompleted();
         }}
-        onComplete={markTutorialCompleted}
+        onComplete={() => {
+          markTutorialCompleted();
+        }}
       />
     </Container>
   );

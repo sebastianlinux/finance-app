@@ -31,23 +31,31 @@ export default function TutorialLauncher({ open, onClose }: TutorialLauncherProp
   const { t } = useTranslation();
   const { startTutorial, enableDemoMode, markTutorialCompleted } = useTutorial();
   const [tourOpen, setTourOpen] = useState(false);
+  const [tourKey, setTourKey] = useState(0); // Key to force remount
 
   const handleStartTour = () => {
     onClose();
-    setTourOpen(true);
+    // Reset tour to step 0 by changing key
+    setTourKey((prev) => prev + 1);
+    setTimeout(() => {
+      setTourOpen(true);
+    }, 300);
   };
 
   const handleStartDemo = () => {
     enableDemoMode();
     onClose();
+    // Reset tour to step 0 by changing key
+    setTourKey((prev) => prev + 1);
     // Opcional: iniciar tour después de cargar demo
     setTimeout(() => {
       setTourOpen(true);
-    }, 500);
+    }, 800);
   };
 
   const handleTourComplete = () => {
     setTourOpen(false);
+    setTourKey((prev) => prev + 1); // Reset for next time
     markTutorialCompleted();
   };
 
@@ -155,9 +163,13 @@ export default function TutorialLauncher({ open, onClose }: TutorialLauncherProp
       </Dialog>
 
       <TutorialTour
+        key={tourKey}
         steps={mainSteps}
         open={tourOpen}
-        onClose={() => setTourOpen(false)}
+        onClose={() => {
+          setTourOpen(false);
+          setTourKey((prev) => prev + 1); // Reset for next time
+        }}
         onComplete={handleTourComplete}
       />
     </>

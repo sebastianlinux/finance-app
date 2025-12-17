@@ -6,21 +6,12 @@ import {
   Paper,
   Typography,
   Button,
-  IconButton,
-  Stepper,
-  Step,
-  StepLabel,
-  Dialog,
-  DialogContent,
-  DialogActions,
   Chip,
-  Fade,
-  Zoom,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -49,34 +40,68 @@ export default function TutorialTour({
   showProgress = true,
 }: TutorialTourProps) {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [currentStep, setCurrentStep] = useState(0);
   const [highlightedElement, setHighlightedElement] = useState<HTMLElement | null>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
+
+  // Reset to step 0 when tour opens
+  useEffect(() => {
+    if (open) {
+      setCurrentStep(0);
+      setHighlightedElement(null);
+    } else {
+      // Clean up when closing
+      setCurrentStep(0);
+      setHighlightedElement(null);
+    }
+  }, [open]);
 
   const currentStepData = steps[currentStep];
   const isLastStep = currentStep === steps.length - 1;
   const isFirstStep = currentStep === 0;
 
   useEffect(() => {
-    if (!open || !currentStepData?.target) return;
-
-    const element = document.querySelector(currentStepData.target) as HTMLElement;
-    if (element) {
-      setHighlightedElement(element);
-      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      
-      // Agregar clase para resaltar
-      element.style.transition = 'all 0.3s ease';
-      element.style.zIndex = '9999';
-      element.style.position = 'relative';
-      
-      return () => {
-        element.style.zIndex = '';
-        element.style.position = '';
-      };
-    } else {
+    if (!open || !currentStepData?.target) {
       setHighlightedElement(null);
+      return;
     }
+
+    // Small delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      const element = document.querySelector(currentStepData.target!) as HTMLElement;
+      if (element) {
+        setHighlightedElement(element);
+        
+        // Scroll into view with better mobile support
+        const mobileCheck = window.innerWidth < 768;
+        element.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: mobileCheck ? 'center' : 'center',
+          inline: 'center',
+        });
+        
+        // Agregar clase para resaltar
+        element.style.transition = 'all 0.3s ease';
+        element.style.zIndex = '9999';
+        const originalPosition = element.style.position;
+        const originalZIndex = element.style.zIndex;
+        
+        if (getComputedStyle(element).position === 'static') {
+          element.style.position = 'relative';
+        }
+        
+        return () => {
+          element.style.zIndex = originalZIndex;
+          element.style.position = originalPosition;
+        };
+      } else {
+        setHighlightedElement(null);
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, [open, currentStep, currentStepData]);
 
   const handleNext = () => {
@@ -110,41 +135,82 @@ export default function TutorialTour({
   if (!open || !currentStepData) return null;
 
   const getTooltipPosition = () => {
-    if (!highlightedElement) return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
+    if (!highlightedElement) {
+      // Centered for steps without target
+      return { 
+        top: '50%', 
+        left: '50%', 
+        transform: 'translate(-50%, -50%)',
+        maxWidth: '90vw',
+        width: 'auto',
+      };
+    }
     
     const rect = highlightedElement.getBoundingClientRect();
     const position = currentStepData.position || 'bottom';
     
+    // On mobile, always show below or above, never on sides
+    if (isMobile || window.innerWidth < 768) {
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const spaceAbove = rect.top;
+      
+      if (spaceBelow > 200 || spaceBelow > spaceAbove) {
+        // Show below
+        return {
+          top: `${rect.bottom + 20}px`,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          maxWidth: '90vw',
+          width: 'calc(100vw - 40px)',
+        };
+      } else {
+        // Show above
+        return {
+          top: `${rect.top - 20}px`,
+          left: '50%',
+          transform: 'translate(-50%, -100%)',
+          maxWidth: '90vw',
+          width: 'calc(100vw - 40px)',
+        };
+      }
+    }
+    
+    // Desktop positioning
     switch (position) {
       case 'top':
         return {
-          top: `${rect.top - 20}px`,
+          top: `${Math.max(20, rect.top - 20)}px`,
           left: `${rect.left + rect.width / 2}px`,
           transform: 'translate(-50%, -100%)',
+          maxWidth: '400px',
         };
       case 'bottom':
         return {
-          top: `${rect.bottom + 20}px`,
+          top: `${Math.min(window.innerHeight - 300, rect.bottom + 20)}px`,
           left: `${rect.left + rect.width / 2}px`,
           transform: 'translateX(-50%)',
+          maxWidth: '400px',
         };
       case 'left':
         return {
           top: `${rect.top + rect.height / 2}px`,
-          left: `${rect.left - 20}px`,
+          left: `${Math.max(20, rect.left - 20)}px`,
           transform: 'translate(-100%, -50%)',
+          maxWidth: '350px',
         };
       case 'right':
         return {
           top: `${rect.top + rect.height / 2}px`,
-          left: `${rect.right + 20}px`,
+          left: `${Math.min(window.innerWidth - 350, rect.right + 20)}px`,
           transform: 'translateY(-50%)',
+          maxWidth: '350px',
         };
       default:
         return {
-          top: `${rect.bottom + 20}px`,
+          top: `${Math.min(window.innerHeight - 300, rect.bottom + 20)}px`,
           left: `${rect.left + rect.width / 2}px`,
           transform: 'translateX(-50%)',
+          maxWidth: '400px',
         };
     }
   };
@@ -185,18 +251,18 @@ export default function TutorialTour({
               position: 'fixed',
               ...getTooltipPosition(),
               zIndex: 10000,
-              maxWidth: 400,
-              minWidth: 300,
             }}
           >
             <Paper
               elevation={24}
               sx={{
-                p: 3,
+                p: { xs: 2, sm: 3 },
                 borderRadius: 3,
                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                 color: 'white',
                 position: 'relative',
+                maxWidth: '100%',
+                mx: { xs: 2, sm: 0 },
               }}
             >
               {/* Indicador de paso */}
@@ -214,18 +280,38 @@ export default function TutorialTour({
                 </Box>
               )}
 
-              <Typography variant="h6" fontWeight={700} gutterBottom sx={{ color: 'white' }}>
+              <Typography 
+                variant="h6" 
+                fontWeight={700} 
+                gutterBottom 
+                sx={{ color: 'white', fontSize: { xs: '1rem', sm: '1.25rem' } }}
+              >
                 {currentStepData.title}
               </Typography>
-              <Typography variant="body2" sx={{ mb: 3, color: 'rgba(255, 255, 255, 0.9)', lineHeight: 1.6 }}>
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  mb: { xs: 2, sm: 3 }, 
+                  color: 'rgba(255, 255, 255, 0.9)', 
+                  lineHeight: 1.6,
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
+                }}
+              >
                 {currentStepData.content}
               </Typography>
 
               {/* Controles de navegación */}
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Box>
+              <Box sx={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center',
+                flexDirection: { xs: 'column', sm: 'row' },
+                gap: { xs: 2, sm: 0 },
+              }}>
+                <Box sx={{ width: { xs: '100%', sm: 'auto' } }}>
                   {!isFirstStep && (
                     <Button
+                      fullWidth={isMobile}
                       startIcon={<NavigateBeforeIcon />}
                       onClick={handlePrevious}
                       sx={{ color: 'white', textTransform: 'none' }}
@@ -234,14 +320,21 @@ export default function TutorialTour({
                     </Button>
                   )}
                 </Box>
-                <Box sx={{ display: 'flex', gap: 1 }}>
+                <Box sx={{ 
+                  display: 'flex', 
+                  gap: 1,
+                  width: { xs: '100%', sm: 'auto' },
+                  flexDirection: { xs: 'column-reverse', sm: 'row' },
+                }}>
                   <Button
+                    fullWidth={isMobile}
                     onClick={handleSkip}
                     sx={{ color: 'rgba(255, 255, 255, 0.8)', textTransform: 'none' }}
                   >
                     {t('tutorial.skip') || 'Skip'}
                   </Button>
                   <Button
+                    fullWidth={isMobile}
                     variant="contained"
                     endIcon={isLastStep ? undefined : <NavigateNextIcon />}
                     onClick={handleNext}
