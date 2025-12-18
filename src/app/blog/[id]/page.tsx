@@ -1,6 +1,6 @@
 'use client';
 
-import { 
+import {
   Container, 
   Typography, 
   Box, 
@@ -12,6 +12,7 @@ import {
   Chip,
   Divider,
   IconButton,
+  TextField,
   useTheme,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
@@ -27,6 +28,10 @@ import LockIcon from '@mui/icons-material/Lock';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import CategoryIcon from '@mui/icons-material/Category';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import CommentIcon from '@mui/icons-material/Comment';
+import SendIcon from '@mui/icons-material/Send';
+import Avatar from '@mui/material/Avatar';
 import { motion } from 'framer-motion';
 
 // Blog articles content
@@ -293,6 +298,127 @@ function BlogDetailPage({ params }: { params: Promise<{ id: string }> | { id: st
   const theme = useTheme();
   const contentPreview = article.content.substring(0, 500);
   const remainingContent = article.content.substring(500);
+
+  // Mock comments data
+  const [comments, setComments] = useState([
+    {
+      id: '1',
+      author: 'Sarah Johnson',
+      avatar: 'SJ',
+      content: 'Great article! These tips really helped me organize my budget better. The 50/30/20 rule is a game changer.',
+      likes: 12,
+      liked: false,
+      date: '2024-01-16T10:30:00',
+      replies: [
+        {
+          id: '1-1',
+          author: 'Mike Chen',
+          avatar: 'MC',
+          content: 'I totally agree! I\'ve been using it for 3 months now and it works perfectly.',
+          likes: 5,
+          liked: false,
+          date: '2024-01-16T14:20:00',
+        },
+      ],
+    },
+    {
+      id: '2',
+      author: 'David Martinez',
+      avatar: 'DM',
+      content: 'Thanks for sharing. I especially liked the part about automating savings. Setting up automatic transfers made a huge difference for me.',
+      likes: 8,
+      liked: true,
+      date: '2024-01-17T09:15:00',
+      replies: [],
+    },
+    {
+      id: '3',
+      author: 'Emily Brown',
+      avatar: 'EB',
+      content: 'This is exactly what I needed! As someone new to budgeting, these tips are very clear and actionable. Looking forward to more articles like this.',
+      likes: 15,
+      liked: false,
+      date: '2024-01-18T16:45:00',
+      replies: [],
+    },
+  ]);
+
+  const [newComment, setNewComment] = useState('');
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState('');
+
+  const handleLike = (commentId: string, isReply: boolean = false, parentId?: string) => {
+    setComments((prev) =>
+      prev.map((comment) => {
+        if (isReply && parentId && comment.id === parentId) {
+          return {
+            ...comment,
+            replies: comment.replies.map((reply) =>
+              reply.id === commentId
+                ? { ...reply, liked: !reply.liked, likes: reply.liked ? reply.likes - 1 : reply.likes + 1 }
+                : reply
+            ),
+          };
+        }
+        if (comment.id === commentId) {
+          return {
+            ...comment,
+            liked: !comment.liked,
+            likes: comment.liked ? comment.likes - 1 : comment.likes + 1,
+          };
+        }
+        return comment;
+      })
+    );
+  };
+
+  const handleAddComment = () => {
+    if (!newComment.trim()) return;
+
+    const comment = {
+      id: Date.now().toString(),
+      author: user?.name || 'Anonymous',
+      avatar: (user?.name || 'A').charAt(0).toUpperCase(),
+      content: newComment,
+      likes: 0,
+      liked: false,
+      date: new Date().toISOString(),
+      replies: [],
+    };
+
+    setComments([...comments, comment]);
+    setNewComment('');
+  };
+
+  const handleAddReply = (parentId: string) => {
+    if (!replyText.trim()) return;
+
+    setComments((prev) =>
+      prev.map((comment) => {
+        if (comment.id === parentId) {
+          return {
+            ...comment,
+            replies: [
+              ...comment.replies,
+              {
+                id: `${parentId}-${Date.now()}`,
+                author: user?.name || 'Anonymous',
+                avatar: (user?.name || 'A').charAt(0).toUpperCase(),
+                content: replyText,
+                likes: 0,
+                liked: false,
+                date: new Date().toISOString(),
+              },
+            ],
+          };
+        }
+        return comment;
+      })
+    );
+
+    setReplyText('');
+    setReplyingTo(null);
+  };
 
   // Format content with better structure
   const formatContent = (text: string) => {
@@ -649,6 +775,218 @@ function BlogDetailPage({ params }: { params: Promise<{ id: string }> | { id: st
                 </Box>
               )}
             </Paper>
+
+            {/* Comments Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
+              <Paper
+                sx={{
+                  mt: 4,
+                  p: { xs: 3, md: 4 },
+                  borderRadius: 3,
+                  boxShadow: theme.palette.mode === 'dark'
+                    ? '0 8px 32px rgba(0, 0, 0, 0.3)'
+                    : '0 8px 32px rgba(0, 0, 0, 0.08)',
+                  border: 1,
+                  borderColor: 'divider',
+                  bgcolor: 'background.paper',
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
+                  <CommentIcon color="primary" />
+                  <Typography variant="h5" fontWeight={700}>
+                    {t('blog.comments') || 'Comments'} ({comments.length})
+                  </Typography>
+                </Box>
+
+                {/* Add Comment */}
+                <Box sx={{ mb: 4 }}>
+                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                    <Avatar sx={{ bgcolor: 'primary.main' }}>
+                      {(user?.name || 'A').charAt(0).toUpperCase()}
+                    </Avatar>
+                    <Box sx={{ flex: 1 }}>
+                      <TextField
+                        fullWidth
+                        multiline
+                        rows={3}
+                        placeholder={t('blog.writeComment') || 'Write a comment...'}
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                        variant="outlined"
+                        sx={{ mb: 1 }}
+                      />
+                      <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <Button
+                          variant="contained"
+                          startIcon={<SendIcon />}
+                          onClick={handleAddComment}
+                          disabled={!newComment.trim()}
+                          sx={{ textTransform: 'none' }}
+                        >
+                          {t('blog.postComment') || 'Post Comment'}
+                        </Button>
+                      </Box>
+                    </Box>
+                  </Box>
+                </Box>
+
+                <Divider sx={{ mb: 3 }} />
+
+                {/* Comments List */}
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                  {comments.map((comment) => (
+                    <Box key={comment.id}>
+                      <Box sx={{ display: 'flex', gap: 2 }}>
+                        <Avatar sx={{ bgcolor: 'primary.main', width: 40, height: 40 }}>
+                          {comment.avatar}
+                        </Avatar>
+                        <Box sx={{ flex: 1 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                            <Typography variant="subtitle2" fontWeight={600}>
+                              {comment.author}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              {new Date(comment.date).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}
+                            </Typography>
+                          </Box>
+                          <Typography variant="body2" sx={{ mb: 1.5, lineHeight: 1.7 }}>
+                            {comment.content}
+                          </Typography>
+                          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                            <IconButton
+                              size="small"
+                              onClick={() => handleLike(comment.id)}
+                              color={comment.liked ? 'primary' : 'default'}
+                              sx={{
+                                '&:hover': { bgcolor: 'action.hover' },
+                              }}
+                            >
+                              <ThumbUpIcon fontSize="small" />
+                            </IconButton>
+                            <Typography variant="caption" color="text.secondary">
+                              {comment.likes} {t('blog.likes') || 'likes'}
+                            </Typography>
+                            <Button
+                              size="small"
+                              onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
+                              sx={{ textTransform: 'none', minWidth: 'auto', px: 1 }}
+                            >
+                              {replyingTo === comment.id
+                                ? t('blog.cancel') || 'Cancel'
+                                : t('blog.reply') || 'Reply'}
+                            </Button>
+                          </Box>
+
+                          {/* Reply Input */}
+                          {replyingTo === comment.id && (
+                            <Box sx={{ mt: 2, ml: 2, pl: 2, borderLeft: 2, borderColor: 'divider' }}>
+                              <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
+                                <Avatar sx={{ bgcolor: 'secondary.main', width: 32, height: 32 }}>
+                                  {(user?.name || 'A').charAt(0).toUpperCase()}
+                                </Avatar>
+                                <Box sx={{ flex: 1 }}>
+                                  <TextField
+                                    fullWidth
+                                    multiline
+                                    rows={2}
+                                    placeholder={t('blog.writeReply') || 'Write a reply...'}
+                                    value={replyText}
+                                    onChange={(e) => setReplyText(e.target.value)}
+                                    variant="outlined"
+                                    size="small"
+                                    sx={{ mb: 1 }}
+                                  />
+                                  <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+                                    <Button
+                                      size="small"
+                                      onClick={() => {
+                                        setReplyingTo(null);
+                                        setReplyText('');
+                                      }}
+                                      sx={{ textTransform: 'none' }}
+                                    >
+                                      {t('common.cancel')}
+                                    </Button>
+                                    <Button
+                                      size="small"
+                                      variant="contained"
+                                      onClick={() => handleAddReply(comment.id)}
+                                      disabled={!replyText.trim()}
+                                      sx={{ textTransform: 'none' }}
+                                    >
+                                      {t('blog.reply') || 'Reply'}
+                                    </Button>
+                                  </Box>
+                                </Box>
+                              </Box>
+                            </Box>
+                          )}
+
+                          {/* Replies */}
+                          {comment.replies.length > 0 && (
+                            <Box sx={{ mt: 2, ml: 2, pl: 2, borderLeft: 2, borderColor: 'divider' }}>
+                              {comment.replies.map((reply) => (
+                                <Box key={reply.id} sx={{ mb: 2 }}>
+                                  <Box sx={{ display: 'flex', gap: 1.5 }}>
+                                    <Avatar sx={{ bgcolor: 'secondary.main', width: 32, height: 32 }}>
+                                      {reply.avatar}
+                                    </Avatar>
+                                    <Box sx={{ flex: 1 }}>
+                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                                        <Typography variant="caption" fontWeight={600}>
+                                          {reply.author}
+                                        </Typography>
+                                        <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+                                          {new Date(reply.date).toLocaleDateString('en-US', {
+                                            month: 'short',
+                                            day: 'numeric',
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                          })}
+                                        </Typography>
+                                      </Box>
+                                      <Typography variant="body2" sx={{ mb: 1, lineHeight: 1.6, fontSize: '0.875rem' }}>
+                                        {reply.content}
+                                      </Typography>
+                                      <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                                        <IconButton
+                                          size="small"
+                                          onClick={() => handleLike(reply.id, true, comment.id)}
+                                          color={reply.liked ? 'primary' : 'default'}
+                                          sx={{
+                                            '&:hover': { bgcolor: 'action.hover' },
+                                            padding: '4px',
+                                          }}
+                                        >
+                                          <ThumbUpIcon sx={{ fontSize: '1rem' }} />
+                                        </IconButton>
+                                        <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+                                          {reply.likes}
+                                        </Typography>
+                                      </Box>
+                                    </Box>
+                                  </Box>
+                                </Box>
+                              ))}
+                            </Box>
+                          )}
+                        </Box>
+                      </Box>
+                    </Box>
+                  ))}
+                </Box>
+              </Paper>
+            </motion.div>
           </motion.div>
         </Container>
       </Box>

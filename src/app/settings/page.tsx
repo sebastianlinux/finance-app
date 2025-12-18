@@ -35,6 +35,8 @@ const currencies = [
 const languages = [
   { value: 'en', label: 'English' },
   { value: 'es', label: 'Español' },
+  { value: 'fr', label: 'Français' },
+  { value: 'zh', label: '中文' },
 ];
 
 function SettingsPage() {

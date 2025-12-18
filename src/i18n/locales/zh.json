@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Finance Tracker",
+    "appName": "财务追踪器",
     "dashboard": "Dashboard",
     "transactions": "Transactions",
     "budgets": "Budgets",
@@ -207,27 +207,27 @@
     "support": "Support"
   },
   "faq": {
-    "title": "Frequently Asked Questions",
-    "subtitle": "Find answers to common questions about Finance Tracker",
-    "q1": "How do I get started with Finance Tracker?",
-    "a1": "Getting started is easy! Simply create a free account, and you can immediately start tracking your income and expenses. Add your first transaction to see how it works.",
-    "q2": "Is my financial data secure?",
-    "a2": "Yes, absolutely! All your data is stored locally in your browser using secure encryption. We don't have access to your financial information, and it never leaves your device.",
-    "q3": "Can I use Finance Tracker on multiple devices?",
-    "a3": "Currently, Finance Tracker stores data locally in your browser. To sync across devices, you would need to export and import your data. We're working on cloud sync for future versions.",
-    "q4": "What's the difference between the plans?",
-    "a4": "The Basic plan is free and includes core features like transaction tracking and basic budgets. Standard and Premium plans unlock advanced features like reports, analytics, recurring transactions, and priority support.",
-    "q5": "How do I export my data?",
-    "a5": "You can export your data from the Reports page. We support CSV and PDF formats. Go to Reports, select the data you want to export, and click the export button.",
-    "q6": "Can I cancel my subscription anytime?",
-    "a6": "Yes, you can cancel your subscription at any time from your Profile page. Your access will continue until the end of your current billing period."
+    "title": "常见问题",
+    "subtitle": "查找有关财务追踪器的常见问题答案",
+    "q1": "如何开始使用财务追踪器？",
+    "a1": "开始使用很简单！只需创建一个免费账户，您就可以立即开始追踪您的收入和支出。添加您的第一笔交易以查看其工作原理。",
+    "q2": "我的财务数据安全吗？",
+    "a2": "是的，绝对安全！您的所有数据都使用安全加密存储在浏览器的本地。我们无法访问您的财务信息，数据永远不会离开您的设备。",
+    "q3": "我可以在多个设备上使用财务追踪器吗？",
+    "a3": "目前，财务追踪器将数据存储在浏览器的本地。要在设备之间同步，您需要导出和导入数据。我们正在为未来版本开发云同步功能。",
+    "q4": "各计划之间有什么区别？",
+    "a4": "基础计划是免费的，包括交易追踪和基本预算等核心功能。标准和高级计划解锁高级功能，如报告、分析、定期交易和优先支持。",
+    "q5": "如何导出我的数据？",
+    "a5": "您可以从报告页面导出数据。我们支持CSV和PDF格式。转到报告，选择要导出的数据，然后单击导出按钮。",
+    "q6": "我可以随时取消订阅吗？",
+    "a6": "是的，您可以随时从您的个人资料页面取消订阅。您的访问权限将持续到当前计费周期结束。"
   },
   "support": {
     "title": "Priority Support",
     "newTicket": "New Ticket",
     "noTickets": "No support tickets yet. Create your first ticket!",
-    "faqTitle": "Common Questions",
-    "faqSubtitle": "Quick answers to frequently asked questions",
+    "faqTitle": "常见问题",
+    "faqSubtitle": "快速回答常见问题",
     "upgradeRequired": "Upgrade to Premium to access priority support",
     "premiumRequired": "Premium plan required for priority support",
     "premiumFeature": "Premium Feature",
@@ -510,13 +510,13 @@
     "articleNotFound": "Article Not Found",
     "articleNotFoundMessage": "The article you are looking for does not exist.",
     "basicPlanRestriction": "This article is available for Standard and Premium plans only",
-    "comments": "Comments",
-    "writeComment": "Write a comment...",
-    "postComment": "Post Comment",
-    "likes": "likes",
-    "reply": "Reply",
-    "writeReply": "Write a reply...",
-    "cancel": "Cancel"
+    "comments": "评论",
+    "writeComment": "写评论...",
+    "postComment": "发布评论",
+    "likes": "赞",
+    "reply": "回复",
+    "writeReply": "写回复...",
+    "cancel": "取消"
   },
   "reports": {
     "title": "Reports & Analytics",
@@ -677,7 +677,7 @@
     }
   },
   "landing": {
-    "faqTitle": "Frequently Asked Questions",
-    "faqSubtitle": "Everything you need to know about Finance Tracker"
+    "faqTitle": "常见问题",
+    "faqSubtitle": "关于财务追踪器您需要了解的一切"
   }
 }

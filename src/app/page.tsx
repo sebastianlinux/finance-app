@@ -38,6 +38,7 @@ import Footer from '@/components/Layout/Footer';
 import PremiumModal from '@/components/PremiumModal';
 import Testimonials from '@/components/Testimonials';
 import PageTransition from '@/components/common/PageTransition';
+import FAQ from '@/components/common/FAQ';
 import { useState } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { motion } from 'framer-motion';
@@ -613,6 +614,53 @@ export default function LandingPage() {
               </Grid>
             </Container>
           </Box>
+          </motion.div>
+
+          {/* FAQ Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <Box
+              sx={{
+                py: { xs: 8, md: 12 },
+                bgcolor: 'background.default',
+              }}
+            >
+              <FAQ
+                title={t('landing.faqTitle')}
+                subtitle={t('landing.faqSubtitle')}
+                maxWidth="md"
+                items={[
+                  {
+                    question: t('faq.q1'),
+                    answer: t('faq.a1'),
+                  },
+                  {
+                    question: t('faq.q2'),
+                    answer: t('faq.a2'),
+                  },
+                  {
+                    question: t('faq.q3'),
+                    answer: t('faq.a3'),
+                  },
+                  {
+                    question: t('faq.q4'),
+                    answer: t('faq.a4'),
+                  },
+                  {
+                    question: t('faq.q5'),
+                    answer: t('faq.a5'),
+                  },
+                  {
+                    question: t('faq.q6'),
+                    answer: t('faq.a6'),
+                  },
+                ]}
+              />
+            </Box>
           </motion.div>
         </Box>
         <Footer />

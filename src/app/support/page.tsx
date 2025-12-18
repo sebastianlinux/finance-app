@@ -25,6 +25,7 @@ import { useAuthStore } from '@/store/authStore';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import AppLayout from '@/components/Layout/AppLayout';
 import EmptyState from '@/components/common/EmptyState';
+import FAQ from '@/components/common/FAQ';
 
 interface SupportTicket {
   id: string;
@@ -161,6 +162,33 @@ function SupportPage() {
           </CardContent>
         </Card>
       )}
+
+      {/* FAQ Section */}
+      <Box sx={{ mb: 4 }}>
+        <FAQ
+          title={t('support.faqTitle')}
+          subtitle={t('support.faqSubtitle')}
+          maxWidth="lg"
+          items={[
+            {
+              question: t('faq.q1'),
+              answer: t('faq.a1'),
+            },
+            {
+              question: t('faq.q2'),
+              answer: t('faq.a2'),
+            },
+            {
+              question: t('faq.q4'),
+              answer: t('faq.a4'),
+            },
+            {
+              question: t('faq.q5'),
+              answer: t('faq.a5'),
+            },
+          ]}
+        />
+      </Box>
 
       {tickets.length === 0 ? (
         <EmptyState

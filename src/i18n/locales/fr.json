@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Finance Tracker",
+    "appName": "Suivi Financier",
     "dashboard": "Dashboard",
     "transactions": "Transactions",
     "budgets": "Budgets",
@@ -207,27 +207,27 @@
     "support": "Support"
   },
   "faq": {
-    "title": "Frequently Asked Questions",
-    "subtitle": "Find answers to common questions about Finance Tracker",
-    "q1": "How do I get started with Finance Tracker?",
-    "a1": "Getting started is easy! Simply create a free account, and you can immediately start tracking your income and expenses. Add your first transaction to see how it works.",
-    "q2": "Is my financial data secure?",
-    "a2": "Yes, absolutely! All your data is stored locally in your browser using secure encryption. We don't have access to your financial information, and it never leaves your device.",
-    "q3": "Can I use Finance Tracker on multiple devices?",
-    "a3": "Currently, Finance Tracker stores data locally in your browser. To sync across devices, you would need to export and import your data. We're working on cloud sync for future versions.",
-    "q4": "What's the difference between the plans?",
-    "a4": "The Basic plan is free and includes core features like transaction tracking and basic budgets. Standard and Premium plans unlock advanced features like reports, analytics, recurring transactions, and priority support.",
-    "q5": "How do I export my data?",
-    "a5": "You can export your data from the Reports page. We support CSV and PDF formats. Go to Reports, select the data you want to export, and click the export button.",
-    "q6": "Can I cancel my subscription anytime?",
-    "a6": "Yes, you can cancel your subscription at any time from your Profile page. Your access will continue until the end of your current billing period."
+    "title": "Questions Fréquemment Posées",
+    "subtitle": "Trouvez des réponses aux questions courantes sur Finance Tracker",
+    "q1": "Comment commencer avec Finance Tracker?",
+    "a1": "C'est très simple ! Créez simplement un compte gratuit et vous pouvez immédiatement commencer à suivre vos revenus et dépenses. Ajoutez votre première transaction pour voir comment cela fonctionne.",
+    "q2": "Mes données financières sont-elles sécurisées?",
+    "a2": "Oui, absolument ! Toutes vos données sont stockées localement dans votre navigateur avec un cryptage sécurisé. Nous n'avons pas accès à vos informations financières, et elles ne quittent jamais votre appareil.",
+    "q3": "Puis-je utiliser Finance Tracker sur plusieurs appareils?",
+    "a3": "Actuellement, Finance Tracker stocke les données localement dans votre navigateur. Pour synchroniser entre les appareils, vous devrez exporter et importer vos données. Nous travaillons sur une synchronisation cloud pour les versions futures.",
+    "q4": "Quelle est la différence entre les plans?",
+    "a4": "Le plan Basic est gratuit et inclut les fonctionnalités de base comme le suivi des transactions et les budgets de base. Les plans Standard et Premium débloquent des fonctionnalités avancées comme les rapports, les analyses, les transactions récurrentes et le support prioritaire.",
+    "q5": "Comment exporter mes données?",
+    "a5": "Vous pouvez exporter vos données depuis la page Rapports. Nous supportons les formats CSV et PDF. Allez dans Rapports, sélectionnez les données que vous souhaitez exporter et cliquez sur le bouton d'exportation.",
+    "q6": "Puis-je annuler mon abonnement à tout moment?",
+    "a6": "Oui, vous pouvez annuler votre abonnement à tout moment depuis votre page Profil. Votre accès continuera jusqu'à la fin de votre période de facturation actuelle."
   },
   "support": {
     "title": "Priority Support",
     "newTicket": "New Ticket",
     "noTickets": "No support tickets yet. Create your first ticket!",
-    "faqTitle": "Common Questions",
-    "faqSubtitle": "Quick answers to frequently asked questions",
+    "faqTitle": "Questions Courantes",
+    "faqSubtitle": "Réponses rapides aux questions fréquemment posées",
     "upgradeRequired": "Upgrade to Premium to access priority support",
     "premiumRequired": "Premium plan required for priority support",
     "premiumFeature": "Premium Feature",
@@ -510,13 +510,13 @@
     "articleNotFound": "Article Not Found",
     "articleNotFoundMessage": "The article you are looking for does not exist.",
     "basicPlanRestriction": "This article is available for Standard and Premium plans only",
-    "comments": "Comments",
-    "writeComment": "Write a comment...",
-    "postComment": "Post Comment",
-    "likes": "likes",
-    "reply": "Reply",
-    "writeReply": "Write a reply...",
-    "cancel": "Cancel"
+    "comments": "Commentaires",
+    "writeComment": "Écrire un commentaire...",
+    "postComment": "Publier le commentaire",
+    "likes": "j'aime",
+    "reply": "Répondre",
+    "writeReply": "Écrire une réponse...",
+    "cancel": "Annuler"
   },
   "reports": {
     "title": "Reports & Analytics",
@@ -677,7 +677,7 @@
     }
   },
   "landing": {
-    "faqTitle": "Frequently Asked Questions",
-    "faqSubtitle": "Everything you need to know about Finance Tracker"
+    "faqTitle": "Questions Fréquemment Posées",
+    "faqSubtitle": "Tout ce que vous devez savoir sur Finance Tracker"
   }
 }
