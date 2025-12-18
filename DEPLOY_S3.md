@@ -192,8 +192,16 @@ chmod +x deploy-s3.sh
 
 1. Ve a la pestaña **"Permissions"**
 2. En **"Block public access"**, edita y desmarca todas las opciones (si quieres acceso público)
-3. En **"Bucket policy"**, agrega:
+3. En **"Bucket policy"**, agrega la política del archivo `s3-bucket-policy.json` (reemplaza `TU-BUCKET-NAME` con el nombre de tu bucket):
 
+**Opción A: Usar el archivo incluido**
+```bash
+# Edita s3-bucket-policy.json y reemplaza TU-BUCKET-NAME
+# Luego aplica la política:
+aws s3api put-bucket-policy --bucket tu-bucket-name --policy file://s3-bucket-policy.json
+```
+
+**Opción B: Copiar y pegar manualmente en la consola de AWS**
 ```json
 {
   "Version": "2012-10-17",
@@ -209,12 +217,20 @@ chmod +x deploy-s3.sh
 }
 ```
 
+**⚠️ IMPORTANTE**: Reemplaza `tu-bucket-name` con el nombre real de tu bucket en el ARN.
+
 **⚠️ Nota**: Esto hace el bucket público. Para producción, considera usar CloudFront con OAI.
 
 ### 5.3 Configurar CORS (si es necesario)
 
-En **"Permissions" > "Cross-origin resource sharing (CORS)"**:
+En **"Permissions" > "Cross-origin resource sharing (CORS)"**, agrega la configuración del archivo `s3-cors-policy.json`:
 
+**Opción A: Usar el archivo incluido**
+```bash
+aws s3api put-bucket-cors --bucket tu-bucket-name --cors-configuration file://s3-cors-policy.json
+```
+
+**Opción B: Copiar y pegar manualmente en la consola de AWS**
 ```json
 [
   {
