@@ -148,6 +148,27 @@ Check code quality with ESLint:
 npm run lint
 ```
 
+### Testing
+
+Run unit tests:
+
+```bash
+# Run tests in watch mode
+npm test
+
+# Run tests with UI
+npm run test:ui
+
+# Run tests with coverage
+npm run test:coverage
+```
+
+The test suite includes:
+- **Utility Functions**: Format and category utilities
+- **Store Tests**: Authentication and finance store logic
+- **Component Tests**: Critical components (Login, ProtectedRoute, EmptyState)
+- **Hook Tests**: Custom hooks (useKeyboardShortcuts)
+
 ## 🔑 Demo Credentials
 
 The application includes demo users for testing different subscription plans:
