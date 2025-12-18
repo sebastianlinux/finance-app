@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import {
   Container,
@@ -29,7 +29,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import HistoryIcon from '@mui/icons-material/History';
 import ShareIcon from '@mui/icons-material/Share';
-import LinkIcon from '@mui/icons-material/Link';
+import FolderIcon from '@mui/icons-material/Folder';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import EmailIcon from '@mui/icons-material/Email';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useTranslation } from 'react-i18next';
@@ -54,17 +55,19 @@ function BudgetsPage() {
   const deleteBudget = useFinanceStore((state) => state.deleteBudget);
   const addBudgetTemplate = useFinanceStore((state) => state.addBudgetTemplate);
   const applyBudgetTemplate = useFinanceStore((state) => state.applyBudgetTemplate);
+  const deleteBudgetTemplate = useFinanceStore((state) => state.deleteBudgetTemplate);
   const getCategorySpending = useFinanceStore((state) => state.getCategorySpending);
   const getBudgetHistory = useFinanceStore((state) => state.getBudgetHistory);
   const shareBudget = useFinanceStore((state) => state.shareBudget);
   const getSharedBudgetsByBudget = useFinanceStore((state) => state.getSharedBudgetsByBudget);
-  const revokeSharedBudget = useFinanceStore((state) => state.revokeSharedBudget);
   const currency = useFinanceStore((state) => state.settings.currency);
   
   const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
   const [templateName, setTemplateName] = useState('');
+  const [templatesListDialogOpen, setTemplatesListDialogOpen] = useState(false);
+  const [templateToDelete, setTemplateToDelete] = useState<string | null>(null);
+  const [deleteTemplateDialogOpen, setDeleteTemplateDialogOpen] = useState(false);
   const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [shareBudgetId, setShareBudgetId] = useState<string | null>(null);
   const [sharePermission, setSharePermission] = useState<'view' | 'edit'>('view');
@@ -83,8 +86,6 @@ function BudgetsPage() {
     limit: 0,
     period: 'monthly',
   });
-  
-  const [selectedPeriod, setSelectedPeriod] = useState<'monthly' | 'yearly'>('monthly');
 
   const [errors, setErrors] = useState<Partial<Record<keyof typeof formData, string>>>({});
 
@@ -213,6 +214,15 @@ function BudgetsPage() {
               onClick={() => setTemplateDialogOpen(true)}
             >
               {t('budgets.saveTemplate') || 'Save as Template'}
+            </Button>
+          )}
+          {budgetTemplates.length > 0 && (
+            <Button
+              variant="outlined"
+              startIcon={<FolderIcon />}
+              onClick={() => setTemplatesListDialogOpen(true)}
+            >
+              {t('budgets.loadTemplate') || 'Load Template'}
             </Button>
           )}
           <Button
@@ -479,6 +489,116 @@ function BudgetsPage() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Templates List Dialog */}
+      <Dialog open={templatesListDialogOpen} onClose={() => setTemplatesListDialogOpen(false)} maxWidth="md" fullWidth>
+        <DialogTitle>{t('budgets.savedTemplates') || 'Saved Templates'}</DialogTitle>
+        <DialogContent>
+          {budgetTemplates.length === 0 ? (
+            <Typography color="text.secondary" sx={{ py: 3, textAlign: 'center' }}>
+              {t('budgets.noTemplates') || 'No templates saved yet. Save your current budgets as a template to reuse them later.'}
+            </Typography>
+          ) : (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+              {budgetTemplates.map((template) => (
+                <Card key={template.id} variant="outlined">
+                  <CardContent>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                      <Box sx={{ flex: 1 }}>
+                        <Typography variant="h6" fontWeight={600} gutterBottom>
+                          {template.name}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {template.budgets.length} {template.budgets.length === 1 ? t('budgets.budget') || 'budget' : t('budgets.budgets') || 'budgets'}
+                        </Typography>
+                        {template.createdAt && (
+                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                            {new Date(template.createdAt).toLocaleDateString()}
+                          </Typography>
+                        )}
+                      </Box>
+                      <Box sx={{ display: 'flex', gap: 1 }}>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          startIcon={<PlayArrowIcon />}
+                          onClick={() => {
+                            applyBudgetTemplate(template.id);
+                            setSnackbarMessage(t('budgets.templateApplied') || 'Template applied successfully');
+                            setSnackbarOpen(true);
+                            setTemplatesListDialogOpen(false);
+                          }}
+                        >
+                          {t('budgets.apply') || 'Apply'}
+                        </Button>
+                        <IconButton
+                          color="error"
+                          size="small"
+                          onClick={() => {
+                            setTemplateToDelete(template.id);
+                            setDeleteTemplateDialogOpen(true);
+                          }}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Box>
+                    </Box>
+                    {template.budgets.length > 0 && (
+                      <Box sx={{ mt: 2, pt: 2, borderTop: 1, borderColor: 'divider' }}>
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                          {t('budgets.templateContents') || 'Template contents:'}
+                        </Typography>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                          {template.budgets.slice(0, 5).map((budget, idx) => (
+                            <Chip
+                              key={idx}
+                              label={`${translateCategory(budget.category)}: ${formatCurrency(budget.limit, currency)}`}
+                              size="small"
+                              variant="outlined"
+                            />
+                          ))}
+                          {template.budgets.length > 5 && (
+                            <Chip
+                              label={`+${template.budgets.length - 5} more`}
+                              size="small"
+                              variant="outlined"
+                            />
+                          )}
+                        </Box>
+                      </Box>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setTemplatesListDialogOpen(false)}>
+            {t('common.close')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Template Confirmation Dialog */}
+      <ConfirmDialog
+        open={deleteTemplateDialogOpen}
+        title={t('common.delete')}
+        message={t('budgets.deleteTemplateConfirm') || 'Are you sure you want to delete this template? This action cannot be undone.'}
+        onConfirm={() => {
+          if (templateToDelete) {
+            deleteBudgetTemplate(templateToDelete);
+            setSnackbarMessage(t('budgets.templateDeleted') || 'Template deleted successfully');
+            setSnackbarOpen(true);
+          }
+          setDeleteTemplateDialogOpen(false);
+          setTemplateToDelete(null);
+        }}
+        onCancel={() => {
+          setDeleteTemplateDialogOpen(false);
+          setTemplateToDelete(null);
+        }}
+      />
 
       {/* Budget History Dialog */}
       <Dialog open={historyDialogOpen} onClose={() => setHistoryDialogOpen(false)} maxWidth="md" fullWidth>
