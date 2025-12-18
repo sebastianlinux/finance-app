@@ -206,10 +206,28 @@
     "recurring": "Recurrentes",
     "support": "Soporte"
   },
+  "faq": {
+    "title": "Preguntas Frecuentes",
+    "subtitle": "Encuentra respuestas a preguntas comunes sobre Finance Tracker",
+    "q1": "¿Cómo empiezo con Finance Tracker?",
+    "a1": "¡Empezar es fácil! Simplemente crea una cuenta gratuita y puedes comenzar inmediatamente a rastrear tus ingresos y gastos. Añade tu primera transacción para ver cómo funciona.",
+    "q2": "¿Mis datos financieros están seguros?",
+    "a2": "¡Sí, absolutamente! Todos tus datos se almacenan localmente en tu navegador usando encriptación segura. No tenemos acceso a tu información financiera y nunca sale de tu dispositivo.",
+    "q3": "¿Puedo usar Finance Tracker en múltiples dispositivos?",
+    "a3": "Actualmente, Finance Tracker almacena datos localmente en tu navegador. Para sincronizar entre dispositivos, necesitarías exportar e importar tus datos. Estamos trabajando en sincronización en la nube para versiones futuras.",
+    "q4": "¿Cuál es la diferencia entre los planes?",
+    "a4": "El plan Básico es gratuito e incluye características principales como seguimiento de transacciones y presupuestos básicos. Los planes Estándar y Premium desbloquean características avanzadas como reportes, análisis, transacciones recurrentes y soporte prioritario.",
+    "q5": "¿Cómo exporto mis datos?",
+    "a5": "Puedes exportar tus datos desde la página de Reportes. Soportamos formatos CSV y PDF. Ve a Reportes, selecciona los datos que quieres exportar y haz clic en el botón de exportación.",
+    "q6": "¿Puedo cancelar mi suscripción en cualquier momento?",
+    "a6": "Sí, puedes cancelar tu suscripción en cualquier momento desde tu página de Perfil. Tu acceso continuará hasta el final de tu período de facturación actual."
+  },
   "support": {
     "title": "Soporte Prioritario",
     "newTicket": "Nuevo Ticket",
     "noTickets": "Aún no hay tickets de soporte. ¡Crea tu primer ticket!",
+    "faqTitle": "Preguntas Comunes",
+    "faqSubtitle": "Respuestas rápidas a preguntas frecuentes",
     "upgradeRequired": "Actualiza a Premium para acceder al soporte prioritario",
     "premiumRequired": "Se requiere plan Premium para soporte prioritario",
     "premiumFeature": "Característica Premium",
@@ -334,7 +352,9 @@
     "upgrade": "Actualizar",
     "selectPlan": "Seleccionar Plan",
     "videoTitle": "Véalo En Acción",
-    "videoSubtitle": "Mira lo fácil que es gestionar tus finanzas con nuestro potente gestor"
+    "videoSubtitle": "Mira lo fácil que es gestionar tus finanzas con nuestro potente gestor",
+    "faqTitle": "Preguntas Frecuentes",
+    "faqSubtitle": "Todo lo que necesitas saber sobre Finance Tracker"
   },
   "auth": {
     "loginTitle": "Bienvenido de Nuevo",
@@ -491,7 +511,14 @@
     "upgradeMessage": "El acceso completo a nuestros artículos del blog está disponible con planes Estándar o Premium. ¡Actualiza ahora para leer artículos completos y acceder a contenido exclusivo!",
     "articleNotFound": "Artículo No Encontrado",
     "articleNotFoundMessage": "El artículo que buscas no existe.",
-    "basicPlanRestriction": "Este artículo está disponible solo para planes Estándar y Premium"
+    "basicPlanRestriction": "Este artículo está disponible solo para planes Estándar y Premium",
+    "comments": "Comentarios",
+    "writeComment": "Escribir un comentario...",
+    "postComment": "Publicar Comentario",
+    "likes": "me gusta",
+    "reply": "Responder",
+    "writeReply": "Escribir una respuesta...",
+    "cancel": "Cancelar"
   },
   "reports": {
     "title": "Reportes y Análisis",

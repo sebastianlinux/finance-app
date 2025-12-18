@@ -27,6 +27,8 @@ interface LanguageModalProps {
 const languages = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
   { code: 'es', name: 'Español', flag: '🇪🇸' },
+  { code: 'fr', name: 'Français', flag: '🇫🇷' },
+  { code: 'zh', name: '中文', flag: '🇨🇳' },
 ];
 
 export default function LanguageModal({ open, onClose }: LanguageModalProps) {

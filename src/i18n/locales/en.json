@@ -352,7 +352,9 @@
     "upgrade": "Upgrade",
     "selectPlan": "Select Plan",
     "videoTitle": "See It In Action",
-    "videoSubtitle": "Watch how easy it is to manage your finances with our powerful tracker"
+    "videoSubtitle": "Watch how easy it is to manage your finances with our powerful tracker",
+    "faqTitle": "Frequently Asked Questions",
+    "faqSubtitle": "Everything you need to know about Finance Tracker"
   },
   "auth": {
     "loginTitle": "Welcome Back",
@@ -675,9 +677,5 @@
     "shortcuts": {
       "description": "Open keyboard shortcuts"
     }
-  },
-  "landing": {
-    "faqTitle": "Frequently Asked Questions",
-    "faqSubtitle": "Everything you need to know about Finance Tracker"
   }
 }

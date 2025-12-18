@@ -229,6 +229,7 @@ function BlogDetailPage({ params }: { params: Promise<{ id: string }> | { id: st
   const { t } = useTranslation();
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
+  const theme = useTheme();
   const [premiumModalOpen, setPremiumModalOpen] = useState(false);
   const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null);
 
@@ -241,9 +242,59 @@ function BlogDetailPage({ params }: { params: Promise<{ id: string }> | { id: st
     }
   }, [params]);
 
+  // Mock comments data - MUST be before early returns to follow Rules of Hooks
+  const [comments, setComments] = useState([
+    {
+      id: '1',
+      author: 'Sarah Johnson',
+      avatar: 'SJ',
+      content: 'Great article! These tips really helped me organize my budget better. The 50/30/20 rule is a game changer.',
+      likes: 12,
+      liked: false,
+      date: '2024-01-16T10:30:00',
+      replies: [
+        {
+          id: '1-1',
+          author: 'Mike Chen',
+          avatar: 'MC',
+          content: 'I totally agree! I\'ve been using it for 3 months now and it works perfectly.',
+          likes: 5,
+          liked: false,
+          date: '2024-01-16T14:20:00',
+        },
+      ],
+    },
+    {
+      id: '2',
+      author: 'David Martinez',
+      avatar: 'DM',
+      content: 'Thanks for sharing. I especially liked the part about automating savings. Setting up automatic transfers made a huge difference for me.',
+      likes: 8,
+      liked: true,
+      date: '2024-01-17T09:15:00',
+      replies: [],
+    },
+    {
+      id: '3',
+      author: 'Emily Brown',
+      avatar: 'EB',
+      content: 'This is exactly what I needed! As someone new to budgeting, these tips are very clear and actionable. Looking forward to more articles like this.',
+      likes: 15,
+      liked: false,
+      date: '2024-01-18T16:45:00',
+      replies: [],
+    },
+  ]);
+
+  const [newComment, setNewComment] = useState('');
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState('');
+
   const articleId = resolvedParams?.id;
   const article = articleId ? blogContent[articleId] : null;
   const canAccessFullContent = user?.plan === 'standard' || user?.plan === 'premium';
+  const contentPreview = article?.content.substring(0, 500) || '';
+  const remainingContent = article?.content.substring(500) || '';
 
   if (!resolvedParams) {
     return (
@@ -294,58 +345,6 @@ function BlogDetailPage({ params }: { params: Promise<{ id: string }> | { id: st
       </Box>
     );
   }
-
-  const theme = useTheme();
-  const contentPreview = article.content.substring(0, 500);
-  const remainingContent = article.content.substring(500);
-
-  // Mock comments data
-  const [comments, setComments] = useState([
-    {
-      id: '1',
-      author: 'Sarah Johnson',
-      avatar: 'SJ',
-      content: 'Great article! These tips really helped me organize my budget better. The 50/30/20 rule is a game changer.',
-      likes: 12,
-      liked: false,
-      date: '2024-01-16T10:30:00',
-      replies: [
-        {
-          id: '1-1',
-          author: 'Mike Chen',
-          avatar: 'MC',
-          content: 'I totally agree! I\'ve been using it for 3 months now and it works perfectly.',
-          likes: 5,
-          liked: false,
-          date: '2024-01-16T14:20:00',
-        },
-      ],
-    },
-    {
-      id: '2',
-      author: 'David Martinez',
-      avatar: 'DM',
-      content: 'Thanks for sharing. I especially liked the part about automating savings. Setting up automatic transfers made a huge difference for me.',
-      likes: 8,
-      liked: true,
-      date: '2024-01-17T09:15:00',
-      replies: [],
-    },
-    {
-      id: '3',
-      author: 'Emily Brown',
-      avatar: 'EB',
-      content: 'This is exactly what I needed! As someone new to budgeting, these tips are very clear and actionable. Looking forward to more articles like this.',
-      likes: 15,
-      liked: false,
-      date: '2024-01-18T16:45:00',
-      replies: [],
-    },
-  ]);
-
-  const [newComment, setNewComment] = useState('');
-  const [replyingTo, setReplyingTo] = useState<string | null>(null);
-  const [replyText, setReplyText] = useState('');
 
   const handleLike = (commentId: string, isReply: boolean = false, parentId?: string) => {
     setComments((prev) =>

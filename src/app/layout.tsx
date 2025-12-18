@@ -7,6 +7,7 @@ import { Inter, JetBrains_Mono } from 'next/font/google';
 import { lightTheme, darkTheme } from '@/theme/theme';
 import i18n from '@/i18n/config';
 import { useFinanceStore } from '@/store/financeStore';
+import SplashScreen from '@/components/common/SplashScreen';
 
 // Load Inter font for UI
 const inter = Inter({
@@ -39,14 +40,15 @@ export default function RootLayout({
     }
   }, [language]);
 
-  // Show a simple loading state during hydration
+  // Show a beautiful splash screen during hydration
   if (!mounted) {
     return (
       <html lang="en">
-        <body>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-            Loading...
-          </div>
+        <body style={{ margin: 0, padding: 0, overflow: 'hidden' }}>
+          <ThemeProvider theme={lightTheme}>
+            <CssBaseline />
+            <SplashScreen />
+          </ThemeProvider>
         </body>
       </html>
     );
