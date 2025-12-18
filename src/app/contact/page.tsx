@@ -361,25 +361,23 @@ export default function ContactPage() {
                                 transition={{ duration: 0.4, delay: 0.2 + index * 0.1 }}
                               >
                                 <Box
+                                  component={info.link ? 'a' : 'div'}
+                                  href={info.link || undefined}
+                                  target={info.link ? '_blank' : undefined}
+                                  rel={info.link ? 'noopener noreferrer' : undefined}
                                   sx={{
                                     display: 'flex',
                                     gap: 2,
                                     p: 2,
                                     borderRadius: 2,
                                     transition: 'all 0.3s ease',
+                                    textDecoration: 'none',
+                                    color: 'inherit',
+                                    cursor: info.link ? 'pointer' : 'default',
                                     '&:hover': {
                                       bgcolor: 'action.hover',
                                       transform: 'translateX(4px)',
                                     },
-                                  }}
-                                  component={info.link ? 'a' : 'div'}
-                                  href={info.link || undefined}
-                                  target={info.link ? '_blank' : undefined}
-                                  rel={info.link ? 'noopener noreferrer' : undefined}
-                                  sx={{
-                                    textDecoration: 'none',
-                                    color: 'inherit',
-                                    cursor: info.link ? 'pointer' : 'default',
                                   }}
                                 >
                                   <Box

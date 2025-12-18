@@ -5,11 +5,13 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:static": "next build",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage",
+    "export": "next build"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

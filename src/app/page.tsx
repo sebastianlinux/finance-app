@@ -660,7 +660,7 @@ export default function LandingPage() {
                   },
                 ]}
               />
-            </Box>
+          </Box>
           </motion.div>
         </Box>
         <Footer />
