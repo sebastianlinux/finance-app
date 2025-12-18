@@ -220,16 +220,18 @@ export const useAuthStore = create<AuthState>()(
           invoiceId: '',
         };
         
-        // Generate invoice
+        // Add payment to state first
+        set({ payments: [...state.payments, payment] });
+        
+        // Generate invoice (now that payment is in state)
         const invoice = get().generateInvoice(payment.id, '');
         
         // Create subscription if upgrading
         if (state.user && paymentData.plan !== 'basic') {
           const subscription = get().createSubscription(paymentData.plan, payment.id);
-          set({ subscriptions: [...state.subscriptions, subscription] });
+          set((state) => ({ subscriptions: [...state.subscriptions, subscription] }));
         }
         
-        set({ payments: [...state.payments, payment] });
         return payment;
       },
 

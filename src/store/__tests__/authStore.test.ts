@@ -116,22 +116,14 @@ describe('authStore', () => {
       const store = useAuthStore.getState();
       await store.login('demo@example.com', 'demo123');
       
-      expect(store.user?.plan).toBe('basic');
+      const userBefore = useAuthStore.getState().user;
+      expect(userBefore?.plan).toBe('basic');
       
-      // Create a payment first (required for updatePlan)
-      const payment = store.addPayment({
-        userId: store.user!.id,
-        plan: 'premium',
-        amount: 29.99,
-        currency: 'USD',
-        status: 'completed',
-        paymentMethod: 'credit_card',
-      });
-      
-      // Now update plan
+      // Update plan (this will create payment and subscription internally)
       store.updatePlan('premium');
       
-      expect(store.user?.plan).toBe('premium');
+      const userAfter = useAuthStore.getState().user;
+      expect(userAfter?.plan).toBe('premium');
     });
   });
 });

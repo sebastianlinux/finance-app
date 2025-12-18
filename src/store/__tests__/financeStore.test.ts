@@ -30,10 +30,8 @@ describe('financeStore', () => {
     });
 
     it('should update a transaction', () => {
-      const store = useFinanceStore.getState();
-      
       // Add transaction
-      store.addTransaction({
+      useFinanceStore.getState().addTransaction({
         type: 'expense',
         amount: 100,
         category: 'food',
@@ -41,14 +39,18 @@ describe('financeStore', () => {
         description: 'Original',
       });
       
+      const store = useFinanceStore.getState();
+      expect(store.transactions.length).toBeGreaterThan(0);
       const transactionId = store.transactions[0].id;
       
       // Update transaction
       store.updateTransaction(transactionId, { amount: 200, description: 'Updated' });
       
       const updatedStore = useFinanceStore.getState();
-      expect(updatedStore.transactions[0].amount).toBe(200);
-      expect(updatedStore.transactions[0].description).toBe('Updated');
+      const updatedTransaction = updatedStore.transactions.find(t => t.id === transactionId);
+      expect(updatedTransaction).toBeDefined();
+      expect(updatedTransaction?.amount).toBe(200);
+      expect(updatedTransaction?.description).toBe('Updated');
     });
 
     it('should delete a transaction', () => {
@@ -105,20 +107,24 @@ describe('financeStore', () => {
     });
 
     it('should update a budget', () => {
-      const store = useFinanceStore.getState();
-      
-      store.addBudget({
+      // Add budget
+      useFinanceStore.getState().addBudget({
         category: 'food',
         limit: 500,
         period: 'monthly',
       });
       
+      const store = useFinanceStore.getState();
+      expect(store.budgets.length).toBeGreaterThan(0);
       const budgetId = store.budgets[0].id;
       
+      // Update budget
       store.updateBudget(budgetId, { limit: 600 });
       
       const updatedStore = useFinanceStore.getState();
-      expect(updatedStore.budgets[0].limit).toBe(600);
+      const updatedBudget = updatedStore.budgets.find(b => b.id === budgetId);
+      expect(updatedBudget).toBeDefined();
+      expect(updatedBudget?.limit).toBe(600);
     });
   });
 
